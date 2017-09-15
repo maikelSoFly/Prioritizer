@@ -203,11 +203,6 @@ class TrayMenuViewController: UIViewController {
             ]
             NSLayoutConstraint.activate(containerConstraints)
         }
-        
-        //Placeholder
-//        let lbl = container.subviews[0]
-//        NSLayoutConstraint(item: lbl, attribute: .centerX, relatedBy: .equal, toItem: container, attribute: .centerX, multiplier: 1, constant: 0).isActive = true
-//        NSLayoutConstraint(item: lbl, attribute: .centerY, relatedBy: .equal, toItem: container, attribute: .centerY, multiplier: 1, constant: 0).isActive = true
     }
     
     
