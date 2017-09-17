@@ -12,30 +12,31 @@ protocol TrayMenuDelegate {
     //Implement layoutIfNeeded() in controller containing this tray menu
     func updateLayout()
     func stateChanged(state:TrayMenuState)
+    func verticalPosition(_ y:CGFloat)
 }
 
 enum TrayMenuState {
     case opened, closed
 }
 
+enum TrayMenuStyle {
+    case top, bottom
+}
+
 class TrayMenuViewController: UIViewController {
     // Menu views
     
     // Essential
-    private lazy var label:UILabel = {
+    private var label:UILabel = {
         let label = UILabel()
         label.translatesAutoresizingMaskIntoConstraints = false
-        self.view.addSubview(label)
         label.textColor = .white
         label.textAlignment = .center
         label.text = "MENU"
         label.font = UIFont(name:"Helvetica-Bold", size: 14.0)
         label.heightAnchor.constraint(equalToConstant: 30).isActive = true
         label.widthAnchor.constraint(equalToConstant: 60).isActive = true
-        label.alpha = 0.5
-        
-        label.shadowColor = UIColor.black.withAlphaComponent(0.3)
-        label.shadowOffset = CGSize(width: 0, height: 1)
+        label.alpha = 1.0
         
         return label
     }()
@@ -43,12 +44,11 @@ class TrayMenuViewController: UIViewController {
     private lazy var actionButton:UIButton = {
         let button = UIButton()
         button.translatesAutoresizingMaskIntoConstraints = false
-        self.view.addSubview(button)
         button.tintColor = .white
         button.titleLabel?.text = ""
         button.heightAnchor.constraint(equalToConstant: 30).isActive = true
         button.widthAnchor.constraint(equalToConstant: 30).isActive = true
-        button.alpha = 0.5
+        button.alpha = 1.0
         button.addTarget(self, action: #selector(self.use), for: .touchUpInside)
         
         return button
@@ -62,10 +62,8 @@ class TrayMenuViewController: UIViewController {
         view.dataSource = self
         view.delegate = self
         view.translatesAutoresizingMaskIntoConstraints = false
-        self.view.addSubview(view)
-        view.backgroundColor = UIColor.black.withAlphaComponent(0.1)
+        view.backgroundColor = .clear
         view.alpha = 0
-        
         
         return view
     }()
@@ -76,7 +74,8 @@ class TrayMenuViewController: UIViewController {
     private var trayClosed:CGFloat!
     private var trayOpened:CGFloat!
     private var trayHidden:CGFloat!
-    var constraint:NSLayoutConstraint!
+    private var cornerRadius:CGFloat = 10
+    @objc weak var constraint:NSLayoutConstraint!
     var delegate:TrayMenuDelegate!
     private var trayOriginalCenter:CGFloat!
     private var possibleDirectionState:IndicatorDirection = .downwards {
@@ -96,26 +95,43 @@ class TrayMenuViewController: UIViewController {
         }
     }
     private var style:TrayMenuStyle = .top
-    fileprivate var menuControls = [UIControl]()
-    fileprivate var containerInsets = UIEdgeInsets(top: 40, left: 40, bottom: 10, right: 40)
+    fileprivate var menuControls = [TrayMenuButton]()
+    fileprivate var containerInsets = UIEdgeInsets(top: 40, left: 30, bottom: 10, right: 30)
     fileprivate var itemsPerRow:CGFloat = 4
+    public weak var dimView:DimView!
+    private var vibrancyView:UIVisualEffectView!
     
     enum IndicatorDirection {
         case downwards, upwards
     }
     
-    enum TrayMenuStyle {
-        case top, bottom
-    }
     
-  
     
     // 🔥 FUNCTIONS 🔥
-    
+  
     
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        view.layer.cornerRadius = cornerRadius
+        view.layer.masksToBounds = true
+        
+        let blur = UIBlurEffect(style: .extraLight)
+        let blurView = UIVisualEffectView(effect: blur)
+        blurView.frame = view.frame
+        blurView.backgroundColor = UIColor.black.withAlphaComponent(0.1)
+        view.addSubview(blurView)
+        
+        let vibrancy = UIVibrancyEffect(blurEffect: blur)
+        vibrancyView = UIVisualEffectView(effect: vibrancy)
+        vibrancyView.frame = view.frame
+        
+        // Here adding subviews to have vibrancy appearance
+        vibrancyView.contentView.addSubview(label)
+        vibrancyView.contentView.addSubview(actionButton)
+        vibrancyView.contentView.addSubview(container)
+        
+        blurView.contentView.addSubview(vibrancyView)
     }
 
     override func didReceiveMemoryWarning() {
@@ -124,6 +140,7 @@ class TrayMenuViewController: UIViewController {
     }
     
     func setUpView(trayOpenedHeight:CGFloat, trayClosedHeight:CGFloat, constraint:NSLayoutConstraint!, style:TrayMenuStyle) {
+    
         self.trayOpenedMargin = view.frame.height - trayOpenedHeight
         self.trayClosedHeight = trayClosedHeight
         self.constraint = constraint
@@ -155,7 +172,7 @@ class TrayMenuViewController: UIViewController {
         self.itemsPerRow = itemsPerRow
     }
     
-    func addControls(controls:[UIControl]) {
+    func addControls(controls:[TrayMenuButton]) {
         menuControls.append(contentsOf: controls)
         container.reloadData()
     }
@@ -227,20 +244,28 @@ class TrayMenuViewController: UIViewController {
     func use() {
         if state == .closed {
             //  OPEN
-            constraint.constant = trayOpened
+    
+            self.constraint.constant = trayOpened
+            
             UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 0.5, initialSpringVelocity: 3, options: .curveEaseInOut, animations: {
                 self.delegate.updateLayout()
-                self.container.alpha = 0.5
+                self.container.alpha = 1.0
+                if self.dimView != nil {
+                    self.dimView.alpha = 0.35
+                }
             }, completion: { (success) in
                 self.state = .opened
             })
             
         } else {
             //  CLOSE
-            constraint.constant = trayClosed
+            self.constraint.constant = trayClosed
             UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 0.5, initialSpringVelocity: 3, options: .curveEaseInOut, animations: {
                 self.delegate.updateLayout()
                 self.container.alpha = 0.0
+                if self.dimView != nil {
+                    self.dimView.alpha = 0.0
+                }
             }, completion: { (success) in
                 self.state = .closed
             })
@@ -249,42 +274,51 @@ class TrayMenuViewController: UIViewController {
     
     func move(with translation:CGPoint) {
         if style == .top {
-            let y = (-view.frame.height + trayClosedHeight ... 0).clamp(trayOriginalCenter + translation.y)
+            let y = (-view.frame.height + trayClosedHeight ... -(cornerRadius / 2)).clamp(trayOriginalCenter + translation.y)
             self.constraint.constant = y
-            
-            
         } else {
-            let y = (trayClosed ... 0).clamp(trayOriginalCenter - translation.y)
+            let y = (trayClosed ... -(cornerRadius / 2)).clamp(trayOriginalCenter - translation.y)
             self.constraint.constant = y
+        }
+
+        // Fading dim view if exists
+        if dimView != nil {
+            dimView.alpha = (0 ... 0.35).clamp((self.constraint.constant - trayClosed).remap(from1: 0, to1: trayOpened - trayClosed, from2: 0, to2: 0.35))
         }
         
         // Fading the container
-        container.alpha = (constraint.constant - trayClosed).remap(from1: 0, to1: trayOpened - trayClosed, from2: 0, to2: 0.5)
+        container.alpha = (0 ... 1.0).clamp((self.constraint.constant - trayClosed).remap(from1: 0, to1: trayOpened - trayClosed, from2: 0, to2: 1.0))
     }
     
     
     func stickToBound(with velocity:CGPoint)  {
         let multiplier:CGFloat = style == .top ? 1 : -1
         if multiplier * velocity.y > 0 {
-            let time = (0.3 ... 0.6).clamp(abs((constraint.constant - trayOpened) / velocity.y))
+            let time = (0.3 ... 0.6).clamp(abs((self.constraint.constant - trayOpened) / velocity.y))
             
-            constraint.constant = trayOpened
+            self.constraint.constant = trayOpened
             
             UIView.animate(withDuration: TimeInterval(time), delay: 0, usingSpringWithDamping: 0.5, initialSpringVelocity: 3, options: .curveEaseOut, animations: {
                 self.delegate.updateLayout()
-                self.container.alpha = 0.5
+                self.container.alpha = 1.0
+                if self.dimView != nil {
+                    self.dimView.alpha = 0.35
+                }
             }, completion: {(success) in
                 self.state = .opened
             })
         } else {
             
-            let time = (0.3 ... 0.6).clamp(abs((constraint.constant - trayClosed) / velocity.y))
+            let time = (0.3 ... 0.6).clamp(abs((self.constraint.constant - trayClosed) / velocity.y))
             
-            constraint.constant = trayClosed
+            self.constraint.constant = trayClosed
             
             UIView.animate(withDuration: TimeInterval(time), delay: 0, usingSpringWithDamping: 0.5, initialSpringVelocity: 3, options: .curveEaseOut, animations: {
                 self.delegate.updateLayout()
                 self.container.alpha = 0.0
+                if self.dimView != nil {
+                    self.dimView.alpha = 0.0
+                }
             }, completion: {(success) in
                 self.state = .closed
             })
@@ -305,9 +339,12 @@ class TrayMenuViewController: UIViewController {
 
         if !boolean {
             view.isHidden = false
-            constraint.constant = trayClosed
+            self.constraint.constant = trayClosed
         } else {
-            constraint.constant = trayHidden
+            self.constraint.constant = trayHidden
+            if self.dimView != nil {
+                self.dimView.alpha = 0.0
+            }
         }
 
         if animated {
@@ -328,6 +365,9 @@ class TrayMenuViewController: UIViewController {
                 self.changeDirectionIndicator()
                 self.view.isHidden = true
                 self.container.alpha = 0.0
+                if self.dimView != nil {
+                    self.dimView.alpha = 0.0
+                }
             }
         }
     }
@@ -345,7 +385,7 @@ class TrayMenuViewController: UIViewController {
                 }, completion: { (success) in
                     view.setBackgroundImage(image, for: .normal)
                     UIView.animate(withDuration: 0.2, delay: 0, options: .curveEaseOut, animations: {
-                        view.alpha = 0.5
+                        view.alpha = 1.0
                     }, completion: nil)
                 })
             }
@@ -358,7 +398,7 @@ class TrayMenuViewController: UIViewController {
                 }, completion: { (success) in
                     view.setBackgroundImage(image, for: .normal)
                     UIView.animate(withDuration: 0.2, delay: 0, options: .curveEaseOut, animations: {
-                        view.alpha = 0.5
+                        view.alpha = 1.0
                     }, completion: nil)
                 })
             }
@@ -378,8 +418,8 @@ extension TrayMenuViewController:UICollectionViewDataSource {
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "menuCell", for: indexPath) as! TrayMenuCollectionViewCell
-        cell.backgroundColor = UIColor.white.withAlphaComponent(0.25)
-        cell.configure() // TODO
+        
+        cell.configure(object: menuControls[indexPath.row]) // TODO
         
         return cell
     }

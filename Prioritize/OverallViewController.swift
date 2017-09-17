@@ -31,6 +31,7 @@ class OverallViewController: UIViewController {
             priorityCircleOverallView.setProgress(value: Double(c), for: .targets)
         }
     }
+    fileprivate var dimView:DimView!
     
     
     
@@ -43,6 +44,7 @@ class OverallViewController: UIViewController {
         view.layer.masksToBounds = true
         view.layer.cornerRadius = 5
         
+        
         // Initializing Task Splitter.
         view.bringSubview(toFront: priorityCircleOverallView)
         priorityCircleOverallView.delegate = self
@@ -51,21 +53,41 @@ class OverallViewController: UIViewController {
         
         // Tray menu.
         view.bringSubview(toFront: menuBarView)
+    
         menuBar.setUpView(trayOpenedHeight: 250, trayClosedHeight: 100, constraint: menuBarTopConstraint, style: .top)
         
-        let controls:[UIControl] = [
-            UIButton(),
-            UIButton(),
-            UIButton(),
-            UIButton(),
-            UIButton(),
-            UIButton(),
-            UIButton(),
-            UIButton()
-        ]
         
-        menuBar.addControls(controls: controls)
         
+        let btn1 = TrayMenuButton(image: #imageLiteral(resourceName: "box"), description: "Folders")
+        let btn2 = TrayMenuButton(image: #imageLiteral(resourceName: "flame"), description: "Hot")
+        let btn3 = TrayMenuButton(image: #imageLiteral(resourceName: "shuffle"), description: "Shuffle")
+        let btn4 = TrayMenuButton(image: #imageLiteral(resourceName: "burger"), description: "Meal")
+        let btn5 = TrayMenuButton(image: #imageLiteral(resourceName: "image"), description: "Images")
+        let btn6 = TrayMenuButton(image: #imageLiteral(resourceName: "lens"), description: "Camera")
+        let btn7 = TrayMenuButton(image: #imageLiteral(resourceName: "bitcoin"), description: "Wallet")
+        let btn8 = TrayMenuButton(image: #imageLiteral(resourceName: "profile"), description: "Profile")
+        let arr = [btn1, btn2, btn3, btn4, btn5, btn6, btn7, btn8]
+        
+        menuBar.addControls(controls: arr)
+        
+        for btn in arr {
+            btn.addTarget(self, action: #selector(test(sender:)), for: .touchUpInside)
+        }
+        
+        
+        // Dim View
+        
+        dimView = DimView(in: self.view, forPopUpView: menuBarView, withStyle: .top)
+        menuBar.dimView = dimView
+        dimView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(respondToDimViewTap(sender:))))
+    }
+    
+    @objc func respondToDimViewTap(sender:UITapGestureRecognizer) {
+        menuBar.use()
+    }
+    
+    @objc func test(sender:TrayMenuButton) {
+        print("🍏", sender.buttonDescription)
     }
     
     override func didReceiveMemoryWarning() {
@@ -150,7 +172,11 @@ extension OverallViewController:TrayMenuDelegate {
     }
     
     func stateChanged(state: TrayMenuState) {
-        // opened / closed
+        
+    }
+    
+    func verticalPosition(_ y:CGFloat) {
+        
     }
 }
 

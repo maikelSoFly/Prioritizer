@@ -49,8 +49,8 @@ extension CircularTransition:UIViewControllerAnimatedTransitioning {
                     let displayHeight = UIScreen.main.bounds.size.height
                     let displayWidth = UIScreen.main.bounds.size.width
                     
-                    let multiplier = displayWidth < displayHeight ? (displayHeight + displayHeight/2) / view.bounds.size.height :
-                        (displayWidth + displayWidth/2) / view.bounds.size.width
+                    let multiplier = displayWidth < displayHeight ? (displayHeight * 1.5) / view.bounds.size.height :
+                        (displayWidth * 1.5) / view.bounds.size.width
                     
                     //Hiding subviews
                     UIView.animate(withDuration: 0.2, delay: 0, options: .curveEaseInOut, animations: {
