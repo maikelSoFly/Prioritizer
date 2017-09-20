@@ -213,7 +213,7 @@ class TaskSplitter: NSObject {
         switch tier {
         case .optional:
             for (index, task) in optionals.enumerated() {
-                if task._tier != task.tier {
+                if task.oldTier != task.tier {
                     moveTask(task, to: task.tier)
                     optionals.remove(at: index)
                 }
@@ -221,7 +221,7 @@ class TaskSplitter: NSObject {
             break
         case .moderate:
             for (index, task) in optionals.enumerated() {
-                if task._tier != task.tier {
+                if task.oldTier != task.tier {
                     moveTask(task, to: task.tier)
                     moderates.remove(at: index)
                 }
@@ -229,7 +229,7 @@ class TaskSplitter: NSObject {
             break
         case .urgent:
             for (index, task) in optionals.enumerated() {
-                if task._tier != task.tier {
+                if task.oldTier != task.tier {
                     moveTask(task, to: task.tier)
                     urgents.remove(at: index)
                 }

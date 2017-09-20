@@ -11,58 +11,56 @@ import UIKit
 class Task: NSObject {
     public var title:String
     public var additionalDescription:String
-    public var priority:TaskPriority // Granted by user.
-    public var maxRealizationTime:Measurement<UnitDuration> // Provided by user
+    private(set) var priority:TaskPriority
+    private(set) var maxRealizationTime:Measurement<UnitDuration> // Provided by user
     public var maxRealizationTimeInSeconds:Measurement<UnitDuration> {
         get {
             return maxRealizationTime.converted(to: .seconds)
         }
     }
-    private var taskDurationTime:Double { /// From when task is added till deadline
+    public var taskDurationTime:Double { /// From when task is added till deadline
         get {
             return deadline.timeIntervalSince(timestamp)
         }
     }
-    private var freeTime:Double { /// ADDED--FREETIME--MAXREALIZATIONTIME--DEADLINE
+    public var freeTime:Double { /// ADDED--FREETIME--MAXREALIZATIONTIME--DEADLINE
         get {
             return taskDurationTime - maxRealizationTimeInSeconds.value
         }
     }
     public var currentDuration:Double {
-        return abs(timestamp.timeIntervalSinceNow)
+        get {
+            return abs(timestamp.timeIntervalSinceNow)
+        }
     }
-    public var deadline:Date
-    public var timestamp:Date
+    private(set) var deadline:Date
+    private(set) var timestamp:Date
     
     /// Returns specific PriorityTier to assign task to proper group.
     /// Default partitions:
     ///     • Tier 3: from 0 - 50% of freeTime                              (OPTIONAL)
     ///     • Tier 2: from 50% of freeTime till 20% of maxRealizationTime   (MODERATE)
     ///     • Tier 1: from 20% of maxRealizationTime                        (URGENT)
-    var _tier:PriorityTier = .optional {
-        didSet {
-            
-        }
-    }
-    var tier:PriorityTier {
+    private(set) var oldTier:PriorityTier = .optional
+    public var tier:PriorityTier {
         get {
             let tier2Border = (freeTime * 0.5) + priorityOffset
             let tier1Border = (freeTime + maxRealizationTimeInSeconds.value * 0.2) + priorityOffset
             
             
             if currentDuration >= taskDurationTime {
-                _tier = .outdated
+                oldTier = .outdated
                 return .outdated
             }
             
             if currentDuration >= tier1Border {
-                _tier = .urgent
+                oldTier = .urgent
                 return .urgent
             } else if currentDuration >= tier2Border {
-                _tier = .moderate
+                oldTier = .moderate
                 return .moderate
             } else {
-                _tier = .optional
+                oldTier = .optional
                 return .optional
             }
         }
@@ -70,7 +68,7 @@ class Task: NSObject {
     
     /// Remaining time till deadline.
     /// Calculated from deadline and current time.
-    var remainingTime:Measurement<UnitDuration> {
+    public var remainingTime:Measurement<UnitDuration> {
         get { // Returns remaing time till deadline in minutes.
             let timeInterval = deadline.timeIntervalSinceNow // in seconds
             let minutes = Measurement<UnitDuration>(value: timeInterval, unit: .seconds).converted(to: .minutes)
@@ -98,7 +96,7 @@ class Task: NSObject {
             }
         }
     }
-    var isDone:Bool = false
+    public var isDone:Bool = false
     
     
     
