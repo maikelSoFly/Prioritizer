@@ -57,7 +57,7 @@ class OverallViewController: UIViewController {
         // Initializing Task Splitter.
         view.bringSubview(toFront: priorityCircleOverallView)
         priorityCircleOverallView.delegate = self
-        taskSplitter = TaskSplitter(title: "Moving out to countryside", estimatedTime: TimeMeasurment(value: 6, unit:CFCalendarUnit.year), priorityCircleColors: UIColor.defaultAppColors())
+        taskSplitter = TaskSplitter(title: "Main Task Splitter", priorityCircleColors: UIColor.defaultAppColors())
         priorityCircleOverallView.setUp(for: taskSplitter!)
         
         // Tray menu.

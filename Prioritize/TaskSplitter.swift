@@ -8,36 +8,8 @@
 
 import UIKit
 
-class TimeMeasurment {
-    var value:Int
-    var unit:CFCalendarUnit
-    var minutes:Double {
-        get {
-            switch unit {
-            case CFCalendarUnit.minute:
-                return Double(value)
-            case CFCalendarUnit.hour:
-                return Double(value * 60)
-            case CFCalendarUnit.day:
-                return Double(value * 60 * 24)
-            case CFCalendarUnit.month:
-                return Double(value) * 43829.0639
-            case CFCalendarUnit.year:
-                return Double(value) * 60 * 24 * 365.242199
-            default:
-                return 1
-            }
-        }
-    }
-    init(value:Int, unit:CFCalendarUnit) {
-        self.value = value
-        self.unit = unit
-    }
-}
-
 class TaskSplitter: NSObject {
     var priorityCircleColors:[UIColor]
-    var estimatedTime:TimeMeasurment
     var title:String
     var urgents:[Task]
     var moderates:[Task]
@@ -50,10 +22,9 @@ class TaskSplitter: NSObject {
     }
     
     
-    //Initializing empty goal
-    init(title:String, estimatedTime:TimeMeasurment, priorityCircleColors:[UIColor]) {
+    /// Initializing empty goal
+    init(title:String, priorityCircleColors:[UIColor]) {
         self.title = title
-        self.estimatedTime = estimatedTime
         self.priorityCircleColors = priorityCircleColors
         self.urgents = [Task]()
         self.moderates = [Task]()
@@ -62,10 +33,9 @@ class TaskSplitter: NSObject {
     
     }
     
-    //Initializing goal with existing aims, objectives and targets
-    init(title:String, priorityCircleColors:[UIColor], estimatedTime:TimeMeasurment, urgents:[Task], moderates:[Task], optionals:[Task]) {
+    /// Initializing goal with existing aims, objectives and targets
+    init(title:String, priorityCircleColors:[UIColor], urgents:[Task], moderates:[Task], optionals:[Task]) {
         self.title = title
-        self.estimatedTime = estimatedTime
         self.priorityCircleColors = priorityCircleColors
         self.urgents = urgents
         self.moderates = moderates
@@ -73,10 +43,9 @@ class TaskSplitter: NSObject {
         self.outdated = [Task]()
     }
     
-    //Copying existing goal
+    /// Copying existing goal
     init(splitter:TaskSplitter) {
         self.title = splitter.title
-        self.estimatedTime = splitter.estimatedTime
         self.priorityCircleColors = splitter.priorityCircleColors
         self.urgents = splitter.urgents
         self.moderates = splitter.moderates
@@ -86,7 +55,7 @@ class TaskSplitter: NSObject {
     
     
     
-    // 🔥 FUNCTIONS 🔥
+    /// 🔥 FUNCTIONS 🔥
     
     
     
@@ -152,7 +121,7 @@ class TaskSplitter: NSObject {
         return type == .percentage ? (numberDone / count) * 100 : numberDone
     }
     
-    //Add new task to do
+    
     func addTask(title:String, with description:String, priority:TaskPriority, deadline:Date, maxRealizationTime:Measurement<UnitDuration>) {
         let task = Task(title: title, description: description, priority: priority, deadline: deadline, maxRealizationTime: maxRealizationTime)
         
