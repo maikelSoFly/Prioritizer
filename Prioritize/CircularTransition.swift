@@ -10,7 +10,7 @@ import UIKit
 
 class CircularTransition: NSObject {
     var duration:TimeInterval = 0.1
-    var circle:CircleView?
+    weak var circle:CircleView?
     var transitionMode:CircularTransitionMode = .present
     
 
@@ -84,6 +84,7 @@ extension CircularTransition:UIViewControllerAnimatedTransitioning {
                     }, completion: { (success) in
                         returningView.removeFromSuperview()
                         transitionContext.completeTransition(success)
+                
                     })
                     
                     //Showing subviews with fade animation

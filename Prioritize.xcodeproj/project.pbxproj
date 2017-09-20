@@ -8,9 +8,9 @@
 
 /* Begin PBXBuildFile section */
 		7F028EF31F5F08A8007C9A9D /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F028EF21F5F08A8007C9A9D /* Extensions.swift */; };
-		7F028EF71F605486007C9A9D /* AimsDetailsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F028EF61F605486007C9A9D /* AimsDetailsViewController.swift */; };
-		7F028EF91F60549B007C9A9D /* ObjectivesDetailsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F028EF81F60549B007C9A9D /* ObjectivesDetailsViewController.swift */; };
-		7F028EFB1F6054A7007C9A9D /* TargetsDetailsViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F028EFA1F6054A7007C9A9D /* TargetsDetailsViewController.swift */; };
+		7F028EF71F605486007C9A9D /* UrgentTasksViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F028EF61F605486007C9A9D /* UrgentTasksViewController.swift */; };
+		7F028EF91F60549B007C9A9D /* ModerateTasksViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F028EF81F60549B007C9A9D /* ModerateTasksViewController.swift */; };
+		7F028EFB1F6054A7007C9A9D /* OptionalTasksViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F028EFA1F6054A7007C9A9D /* OptionalTasksViewController.swift */; };
 		7F21463C1F5D96BC00F30E39 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F21463B1F5D96BC00F30E39 /* AppDelegate.swift */; };
 		7F21463E1F5D96BC00F30E39 /* OverallViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F21463D1F5D96BC00F30E39 /* OverallViewController.swift */; };
 		7F2146441F5D96BC00F30E39 /* Prioritize.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 7F2146421F5D96BC00F30E39 /* Prioritize.xcdatamodeld */; };
@@ -23,6 +23,7 @@
 		7F29045B1F6AC053006FB78B /* GradientView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F29045A1F6AC053006FB78B /* GradientView.swift */; };
 		7F74D6671F6D879000A46E96 /* DimView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F74D6661F6D879000A46E96 /* DimView.swift */; };
 		7F74D6691F6EE36600A46E96 /* TrayMenuButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F74D6681F6EE36600A46E96 /* TrayMenuButton.swift */; };
+		7F9314AB1F705BBD00E1D8F8 /* Task.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F9314AA1F705BBD00E1D8F8 /* Task.swift */; };
 		7FD632311F62DC5B00180234 /* TrayMenuViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FD632301F62DC5B00180234 /* TrayMenuViewController.swift */; };
 		7FE74A381F6C11860022CCA2 /* TrayMenuCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FE74A371F6C11860022CCA2 /* TrayMenuCollectionViewCell.swift */; };
 		7FE74A3A1F6C13100022CCA2 /* CircularTransition.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FE74A391F6C13100022CCA2 /* CircularTransition.swift */; };
@@ -41,9 +42,9 @@
 
 /* Begin PBXFileReference section */
 		7F028EF21F5F08A8007C9A9D /* Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
-		7F028EF61F605486007C9A9D /* AimsDetailsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AimsDetailsViewController.swift; sourceTree = "<group>"; };
-		7F028EF81F60549B007C9A9D /* ObjectivesDetailsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ObjectivesDetailsViewController.swift; sourceTree = "<group>"; };
-		7F028EFA1F6054A7007C9A9D /* TargetsDetailsViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TargetsDetailsViewController.swift; sourceTree = "<group>"; };
+		7F028EF61F605486007C9A9D /* UrgentTasksViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UrgentTasksViewController.swift; sourceTree = "<group>"; };
+		7F028EF81F60549B007C9A9D /* ModerateTasksViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ModerateTasksViewController.swift; sourceTree = "<group>"; };
+		7F028EFA1F6054A7007C9A9D /* OptionalTasksViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = OptionalTasksViewController.swift; sourceTree = "<group>"; };
 		7F2146381F5D96BC00F30E39 /* Prioritize.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Prioritize.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		7F21463B1F5D96BC00F30E39 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		7F21463D1F5D96BC00F30E39 /* OverallViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OverallViewController.swift; sourceTree = "<group>"; };
@@ -60,6 +61,7 @@
 		7F29045A1F6AC053006FB78B /* GradientView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GradientView.swift; sourceTree = "<group>"; };
 		7F74D6661F6D879000A46E96 /* DimView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DimView.swift; sourceTree = "<group>"; };
 		7F74D6681F6EE36600A46E96 /* TrayMenuButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TrayMenuButton.swift; sourceTree = "<group>"; };
+		7F9314AA1F705BBD00E1D8F8 /* Task.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Task.swift; sourceTree = "<group>"; };
 		7FD632301F62DC5B00180234 /* TrayMenuViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TrayMenuViewController.swift; sourceTree = "<group>"; };
 		7FE74A371F6C11860022CCA2 /* TrayMenuCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TrayMenuCollectionViewCell.swift; sourceTree = "<group>"; };
 		7FE74A391F6C13100022CCA2 /* CircularTransition.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CircularTransition.swift; path = Prioritize/CircularTransition.swift; sourceTree = "<group>"; };
@@ -135,6 +137,7 @@
 				7FE74A391F6C13100022CCA2 /* CircularTransition.swift */,
 				7FE74A3B1F6C13170022CCA2 /* TaskSplitter.swift */,
 				7F74D6681F6EE36600A46E96 /* TrayMenuButton.swift */,
+				7F9314AA1F705BBD00E1D8F8 /* Task.swift */,
 			);
 			name = Models;
 			path = ..;
@@ -144,9 +147,9 @@
 			isa = PBXGroup;
 			children = (
 				7F21463D1F5D96BC00F30E39 /* OverallViewController.swift */,
-				7F028EF61F605486007C9A9D /* AimsDetailsViewController.swift */,
-				7F028EF81F60549B007C9A9D /* ObjectivesDetailsViewController.swift */,
-				7F028EFA1F6054A7007C9A9D /* TargetsDetailsViewController.swift */,
+				7F028EF61F605486007C9A9D /* UrgentTasksViewController.swift */,
+				7F028EF81F60549B007C9A9D /* ModerateTasksViewController.swift */,
+				7F028EFA1F6054A7007C9A9D /* OptionalTasksViewController.swift */,
 				7FD632301F62DC5B00180234 /* TrayMenuViewController.swift */,
 			);
 			name = Controllers;
@@ -215,6 +218,11 @@
 						CreatedOnToolsVersion = 8.3.3;
 						DevelopmentTeam = QZ39Q3ANW7;
 						ProvisioningStyle = Automatic;
+						SystemCapabilities = {
+							com.apple.BackgroundModes = {
+								enabled = 0;
+							};
+						};
 					};
 					7F21464E1F5D96BC00F30E39 = {
 						CreatedOnToolsVersion = 8.3.3;
@@ -270,19 +278,20 @@
 			files = (
 				7F21466E1F5DD23900F30E39 /* enums.swift in Sources */,
 				7FE74A3A1F6C13100022CCA2 /* CircularTransition.swift in Sources */,
-				7F028EF71F605486007C9A9D /* AimsDetailsViewController.swift in Sources */,
+				7F028EF71F605486007C9A9D /* UrgentTasksViewController.swift in Sources */,
 				7F21463E1F5D96BC00F30E39 /* OverallViewController.swift in Sources */,
-				7F028EF91F60549B007C9A9D /* ObjectivesDetailsViewController.swift in Sources */,
+				7F028EF91F60549B007C9A9D /* ModerateTasksViewController.swift in Sources */,
 				7FE74A381F6C11860022CCA2 /* TrayMenuCollectionViewCell.swift in Sources */,
 				7F028EF31F5F08A8007C9A9D /* Extensions.swift in Sources */,
 				7FE74A3C1F6C13170022CCA2 /* TaskSplitter.swift in Sources */,
 				7F21463C1F5D96BC00F30E39 /* AppDelegate.swift in Sources */,
 				7F74D6671F6D879000A46E96 /* DimView.swift in Sources */,
-				7F028EFB1F6054A7007C9A9D /* TargetsDetailsViewController.swift in Sources */,
+				7F028EFB1F6054A7007C9A9D /* OptionalTasksViewController.swift in Sources */,
 				7F2146661F5DC09700F30E39 /* PriorityCircleOverallView.swift in Sources */,
 				7F29045B1F6AC053006FB78B /* GradientView.swift in Sources */,
 				7FD632311F62DC5B00180234 /* TrayMenuViewController.swift in Sources */,
 				7F2146441F5D96BC00F30E39 /* Prioritize.xcdatamodeld in Sources */,
+				7F9314AB1F705BBD00E1D8F8 /* Task.swift in Sources */,
 				7F74D6691F6EE36600A46E96 /* TrayMenuButton.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

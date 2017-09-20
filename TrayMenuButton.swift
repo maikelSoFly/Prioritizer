@@ -22,4 +22,18 @@ class TrayMenuButton:UIButton {
         fatalError("init(coder:) has not been implemented")
     }
     
+    override var isHighlighted: Bool {
+        didSet {
+            if isHighlighted {
+                UIView.animate(withDuration: 0.2, delay: 0, options: .curveEaseInOut, animations: {
+                    self.backgroundColor = UIColor.white.withAlphaComponent(0.4)
+                }, completion: nil)
+            } else {
+                UIView.animate(withDuration: 0.2, delay: 0, options: .curveEaseInOut, animations: {
+                    self.backgroundColor = .white
+                }, completion: nil)
+            }
+        }
+    }
+    
 }

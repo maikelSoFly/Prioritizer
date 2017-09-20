@@ -19,13 +19,13 @@ class DimView: UIView {
         }
     }
 
-    init(in view: UIView, forPopUpView popup:UIView, withStyle style:TrayMenuStyle) {
+    init(in view: UIView, forTrayView tray:UIView, withStyle style:TrayMenuStyle) {
         let extendedFrame:CGRect
         
         if style == .top {
-            extendedFrame = CGRect(origin: view.frame.origin, size: CGSize(width: view.frame.width, height: view.frame.height + popup.frame.height))
+            extendedFrame = CGRect(origin: view.frame.origin, size: CGSize(width: view.frame.width, height: view.frame.height + tray.frame.height))
         } else {
-            extendedFrame = CGRect(origin: CGPoint(x:0, y: -popup.frame.height), size: CGSize(width: view.frame.width, height: view.frame.height + popup.frame.height))
+            extendedFrame = CGRect(origin: CGPoint(x:0, y: -tray.frame.height), size: CGSize(width: view.frame.width, height: view.frame.height + tray.frame.height))
         }
         super.init(frame: extendedFrame)
         
@@ -33,9 +33,9 @@ class DimView: UIView {
         self.translatesAutoresizingMaskIntoConstraints = false
         self.backgroundColor = .black
         self.alpha = 0.0
-        view.insertSubview(self, belowSubview: popup)
-        setMask(with: popup.frame, in: self)
-        setUpConstraints(in: view, forPopUp: popup, withStyle: style)
+        view.insertSubview(self, belowSubview: tray)
+        setMask(with: tray.frame, in: self)
+        setUpConstraints(in: view, forTrayView: tray, withStyle: style)
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -58,10 +58,10 @@ class DimView: UIView {
         view.layer.mask = mask
     }
     
-    private func setUpConstraints(in view:UIView, forPopUp popup:UIView, withStyle style:TrayMenuStyle) {
+    private func setUpConstraints(in view:UIView, forTrayView tray:UIView, withStyle style:TrayMenuStyle) {
         if style == .top {
             let dimConstraints:[NSLayoutConstraint] = [
-                self.topAnchor.constraint(equalTo: popup.topAnchor),
+                self.topAnchor.constraint(equalTo: tray.topAnchor),
                 self.leadingAnchor.constraint(equalTo: view.leadingAnchor),
                 self.trailingAnchor.constraint(equalTo: view.trailingAnchor),
                 self.widthAnchor.constraint(equalToConstant: self.frame.width),
@@ -71,7 +71,7 @@ class DimView: UIView {
         } else {
             
             let dimConstraints:[NSLayoutConstraint] = [
-                self.bottomAnchor.constraint(equalTo: popup.bottomAnchor),
+                self.bottomAnchor.constraint(equalTo: tray.bottomAnchor),
                 self.leadingAnchor.constraint(equalTo: view.leadingAnchor),
                 self.trailingAnchor.constraint(equalTo: view.trailingAnchor),
                 self.widthAnchor.constraint(equalToConstant: self.frame.width),
@@ -79,7 +79,6 @@ class DimView: UIView {
             ]
             NSLayoutConstraint.activate(dimConstraints)
         }
-        
     }
 
 }

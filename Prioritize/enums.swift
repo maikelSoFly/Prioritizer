@@ -9,16 +9,16 @@
 import UIKit
 
 enum TaskType {
-    case objective
-    case target
-    case aim
+    case urgent
+    case moderate
+    case optional
     case none
 }
 
 enum TaskSplitterStructure {
-    case aims
-    case objectives
-    case targets
+    case urgents
+    case moderates
+    case optionals
     case all
 }
 

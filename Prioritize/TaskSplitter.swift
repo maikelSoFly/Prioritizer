@@ -8,15 +8,7 @@
 
 import UIKit
 
-struct Task {
-    var type:TaskType
-    var title:String
-    var description:String
-    var estimatedTime:TimeMeasurment
-    var isDone:Bool
-}
-
-struct TimeMeasurment {
+class TimeMeasurment {
     var value:Int
     var unit:CFCalendarUnit
     var minutes:Double {
@@ -47,9 +39,10 @@ class TaskSplitter: NSObject {
     var priorityCircleColors:[UIColor]
     var estimatedTime:TimeMeasurment
     var title:String
-    var aims:[Task]
-    var objectives:[Task]
-    var targets:[Task]
+    var urgents:[Task]
+    var moderates:[Task]
+    var optionals:[Task]
+    var outdated:[Task]
     
     enum ProgressType {
         case percentage
@@ -62,20 +55,22 @@ class TaskSplitter: NSObject {
         self.title = title
         self.estimatedTime = estimatedTime
         self.priorityCircleColors = priorityCircleColors
-        self.aims = [Task]()
-        self.objectives = [Task]()
-        self.targets = [Task]()
+        self.urgents = [Task]()
+        self.moderates = [Task]()
+        self.optionals = [Task]()
+        self.outdated = [Task]()
     
     }
     
     //Initializing goal with existing aims, objectives and targets
-    init(title:String, priorityCircleColors:[UIColor], estimatedTime:TimeMeasurment, aims:[Task], objectives:[Task], targets:[Task]) {
+    init(title:String, priorityCircleColors:[UIColor], estimatedTime:TimeMeasurment, urgents:[Task], moderates:[Task], optionals:[Task]) {
         self.title = title
         self.estimatedTime = estimatedTime
         self.priorityCircleColors = priorityCircleColors
-        self.aims = aims
-        self.objectives = objectives
-        self.targets = targets
+        self.urgents = urgents
+        self.moderates = moderates
+        self.optionals = optionals
+        self.outdated = [Task]()
     }
     
     //Copying existing goal
@@ -83,9 +78,10 @@ class TaskSplitter: NSObject {
         self.title = splitter.title
         self.estimatedTime = splitter.estimatedTime
         self.priorityCircleColors = splitter.priorityCircleColors
-        self.aims = splitter.aims
-        self.objectives = splitter.objectives
-        self.targets = splitter.targets
+        self.urgents = splitter.urgents
+        self.moderates = splitter.moderates
+        self.optionals = splitter.optionals
+        self.outdated = splitter.outdated
     }
     
     
@@ -95,9 +91,26 @@ class TaskSplitter: NSObject {
     
     
     func clearAllTasks() {
-        self.aims.removeAll()
-        self.objectives.removeAll()
-        self.targets.removeAll()
+        self.urgents.removeAll()
+        self.moderates.removeAll()
+        self.optionals.removeAll()
+        self.outdated.removeAll()
+    }
+    
+    func clearTaks(in tier:PriorityTier) {
+        switch tier {
+        case .optional:
+            optionals.removeAll()
+            break
+        case .moderate:
+            moderates.removeAll()
+            break
+        case .urgent:
+            urgents.removeAll()
+            break
+        case .outdated:
+            outdated.removeAll()
+        }
     }
     
     func getProgress(for structure: TaskSplitterStructure, of type:ProgressType) -> Double {
@@ -105,93 +118,142 @@ class TaskSplitter: NSObject {
         var count:Double = 0
         
         switch structure {
-        case .aims:
-            for aim in self.aims {
+        case .urgents:
+            for aim in self.urgents {
                 numberDone += aim.isDone ? 1 : 0
             }
-            count = Double(self.aims.count)
+            count = Double(self.urgents.count)
             break
-        case .objectives:
-            for objective in self.objectives {
+        case .moderates:
+            for objective in self.moderates {
                 numberDone += objective.isDone ? 1 : 0
             }
-            count = Double(self.objectives.count)
+            count = Double(self.moderates.count)
             break
-        case .targets:
-            for target in self.targets {
+        case .optionals:
+            for target in self.optionals {
                 numberDone += target.isDone ? 1 : 0
             }
-            count = Double(self.targets.count)
+            count = Double(self.optionals.count)
             break
         case .all:
-            for objective in self.objectives {
+            for objective in self.moderates {
                 numberDone += objective.isDone ? 1 : 0
             }
-            for target in self.targets {
+            for target in self.optionals {
                 numberDone += target.isDone ? 1 : 0
             }
-            for aim in self.aims {
+            for aim in self.urgents {
                 numberDone += aim.isDone ? 1 : 0
             }
-            count = Double(self.aims.count + self.objectives.count + self.targets.count)
+            count = Double(self.urgents.count + self.moderates.count + self.optionals.count)
         }
         
         return type == .percentage ? (numberDone / count) * 100 : numberDone
     }
     
     //Add new task to do
-    func addTask(title:String, with description:String, of type:TaskType, of estimatedTime:TimeMeasurment) {
-        let task = Task(type: type, title: title, description: description, estimatedTime: estimatedTime, isDone: false)
+    func addTask(title:String, with description:String, priority:TaskPriority, deadline:Date, maxRealizationTime:Measurement<UnitDuration>) {
+        let task = Task(title: title, description: description, priority: priority, deadline: deadline, maxRealizationTime: maxRealizationTime)
         
-        switch type {
-        case .aim:
-            self.aims.append(task)
+        switch task.tier {
+        case .optional:
+            optionals.append(task)
             break
-        case .objective:
-            self.objectives.append(task)
+        case .moderate:
+            moderates.append(task)
             break
-        case .target:
-            self.targets.append(task)
+        case .urgent:
+            urgents.append(task)
+            break
         default:
-            print("❗Adding task of type: none")
+            print("❗Task is outdated.")
         }
     }
     
-    //Get const info about task type division basis
-    func getTimeRange(for type:TaskType) -> (from:TimeMeasurment?, to:TimeMeasurment?) {
-        switch type {
-        case .aim:
-            let from = TimeMeasurment(value: 5, unit: .year)
-            return (from, nil)
-        case .objective:
-            let from = TimeMeasurment(value: 3, unit: .month)
-            let to = TimeMeasurment(value: 24, unit: .month)
-            return (from, to)
-        case .target:
-            let to = TimeMeasurment(value: 3, unit: .month)
-            return (nil, to)
-        default:
-            print("❗Adding task of type: none")
-            return (nil, nil)
+    func addTasks(_ tasks:[Task]) {
+        for task in tasks {
+            switch task.tier {
+            case .optional:
+                optionals.append(task)
+                break
+            case .moderate:
+                moderates.append(task)
+                break
+            case .urgent:
+                urgents.append(task)
+                break
+            default:
+                print("❗Task is outdated.")
+            }
         }
     }
     
-    func sortByEstimatedTime(structure:TaskSplitterStructure) {
+    
+    func sortByRemainingTime(structure:TaskSplitterStructure) {
         switch structure {
-        case .aims:
-            self.aims.sort(by: {$0.estimatedTime.minutes < $1.estimatedTime.minutes})
+        case .urgents:
+            self.urgents.sort(by: {$0.remainingTime < $1.remainingTime})
             break
-        case .objectives:
-            self.objectives.sort(by: {$0.estimatedTime.minutes < $1.estimatedTime.minutes})
+        case .moderates:
+            self.moderates.sort(by: {$0.remainingTime < $1.remainingTime})
             break
-        case .targets:
-            self.targets.sort(by: {$0.estimatedTime.minutes < $1.estimatedTime.minutes})
+        case .optionals:
+            self.optionals.sort(by: {$0.remainingTime < $1.remainingTime})
             break
         case .all:
-            self.aims.sort(by: {$0.estimatedTime.minutes < $1.estimatedTime.minutes})
-            self.objectives.sort(by: {$0.estimatedTime.minutes < $1.estimatedTime.minutes})
-            self.targets.sort(by: {$0.estimatedTime.minutes < $1.estimatedTime.minutes})
+            self.urgents.sort(by: {$0.remainingTime < $1.remainingTime})
+            self.moderates.sort(by: {$0.remainingTime < $1.remainingTime})
+            self.optionals.sort(by: {$0.remainingTime < $1.remainingTime})
             break
+        }
+    }
+    
+    func reloadData(for tier:PriorityTier) {
+        switch tier {
+        case .optional:
+            for (index, task) in optionals.enumerated() {
+                if task._tier != task.tier {
+                    moveTask(task, to: task.tier)
+                    optionals.remove(at: index)
+                }
+            }
+            break
+        case .moderate:
+            for (index, task) in optionals.enumerated() {
+                if task._tier != task.tier {
+                    moveTask(task, to: task.tier)
+                    moderates.remove(at: index)
+                }
+            }
+            break
+        case .urgent:
+            for (index, task) in optionals.enumerated() {
+                if task._tier != task.tier {
+                    moveTask(task, to: task.tier)
+                    urgents.remove(at: index)
+                }
+            }
+            break
+        case .outdated:
+            print("❗No need to reload outdated tasks.")
+            break
+        }
+    }
+    
+    private func moveTask(_ task:Task, to tier:PriorityTier) {
+        switch tier {
+        case .optional:
+            optionals.append(task)
+            break
+        case .moderate:
+            moderates.append(task)
+            break
+        case .urgent:
+            urgents.append(task)
+            break
+        case .outdated:
+            outdated.append(task)
         }
     }
     

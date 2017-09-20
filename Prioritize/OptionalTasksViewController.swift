@@ -8,7 +8,7 @@
 
 import UIKit
 
-class TargetsDetailsViewController: UIViewController {
+class OptionalTasksViewController: UIViewController {
     @IBAction func handleDismissButton(_ sender: UIButton) {
         self.dismiss(animated: true, completion: nil)
     }
@@ -17,6 +17,10 @@ class TargetsDetailsViewController: UIViewController {
         super.viewDidLoad()
 
         // Do any additional setup after loading the view.
+    }
+    
+    deinit {
+        print("💾 OptionalTasksViewController deinitialized...")
     }
 
     override func didReceiveMemoryWarning() {

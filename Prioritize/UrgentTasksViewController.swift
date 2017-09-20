@@ -8,14 +8,14 @@
 
 import UIKit
 
-class AimsDetailsViewController: UIViewController {
+class UrgentTasksViewController: UIViewController {
     @IBAction func handleDissmisButton(_ sender: UIButton) {
         self.dismiss(animated: true, completion: nil)
     }
     @IBOutlet weak var menuViewBottomConstraint: NSLayoutConstraint!
     @IBOutlet weak var trayMenuView: UIView!
     
-    var trayMenuViewController:TrayMenuViewController!
+    weak var trayMenuViewController:TrayMenuViewController!
     private var dimView:DimView!
 
     override func viewDidLoad() {
@@ -33,11 +33,16 @@ class AimsDetailsViewController: UIViewController {
         trayMenuViewController.addControls(controls: [btn5, btn6, btn7, btn8])
         
         // Dim View
-        dimView = DimView(in: self.view, forPopUpView: trayMenuView, withStyle: .bottom)
+        dimView = DimView(in: self.view, forTrayView: trayMenuView, withStyle: .bottom)
         trayMenuViewController.dimView = dimView
         dimView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(respondToDimViewTap(sender:))))
         
     }
+    
+    deinit {
+        print("💾 UrgentTasksViewController deinitialized...")
+    }
+    
     
     @objc func respondToDimViewTap(sender:UITapGestureRecognizer) {
         trayMenuViewController.use()
@@ -58,16 +63,8 @@ class AimsDetailsViewController: UIViewController {
 
 }
 
-extension AimsDetailsViewController:TrayMenuDelegate {
+extension UrgentTasksViewController:TrayMenuDelegate {
     func updateLayout() {
         view.layoutIfNeeded()
-    }
-    
-    func stateChanged(state: TrayMenuState) {
-        
-    }
-    
-    func verticalPosition(_ y: CGFloat) {
-        
     }
 }

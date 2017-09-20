@@ -10,6 +10,7 @@ import UIKit
 
 class TrayMenuCollectionViewCell: UICollectionViewCell {
     private weak var control:TrayMenuButton!
+    private var labelHeight:CGFloat = 14
     
     private var label:UILabel = {
         let view = UILabel()
@@ -22,7 +23,6 @@ class TrayMenuCollectionViewCell: UICollectionViewCell {
     
     func configure(object:TrayMenuButton) {
         self.control = object
-        
         self.label.text = object.buttonDescription
         self.layer.masksToBounds = true
         layoutViews()
@@ -33,6 +33,7 @@ class TrayMenuCollectionViewCell: UICollectionViewCell {
     }
     
     func layoutViews() {
+        // This is important to make button circular
         self.contentView.frame = self.bounds
         
         control.translatesAutoresizingMaskIntoConstraints = false
@@ -40,18 +41,15 @@ class TrayMenuCollectionViewCell: UICollectionViewCell {
         
         self.addSubview(control)
         self.addSubview(label)
-        
-        control.tintColor = .white
-        //control.showsTouchWhenHighlighted = true
     
         
-        control.widthAnchor.constraint(equalToConstant: self.frame.width-14).isActive = true
-        control.heightAnchor.constraint(equalToConstant: self.frame.height - 14).isActive = true
+        control.widthAnchor.constraint(equalToConstant: self.frame.width - labelHeight).isActive = true
+        control.heightAnchor.constraint(equalToConstant: self.frame.height - labelHeight).isActive = true
         let constraint = NSLayoutConstraint(item: control, attribute: .centerX, relatedBy: .equal, toItem: self, attribute: .centerX, multiplier: 1, constant: 0)
         constraint.isActive = true
         control.topAnchor.constraint(equalTo: self.topAnchor).isActive = true
         
-        label.heightAnchor.constraint(equalToConstant: 14).isActive = true
+        label.heightAnchor.constraint(equalToConstant: labelHeight).isActive = true
         label.leadingAnchor.constraint(equalTo: self.leadingAnchor).isActive = true
         label.trailingAnchor.constraint(equalTo: self.trailingAnchor).isActive = true
         label.bottomAnchor.constraint(equalTo: self.bottomAnchor).isActive = true
@@ -64,8 +62,4 @@ class TrayMenuCollectionViewCell: UICollectionViewCell {
         control.imageEdgeInsets = UIEdgeInsets(top: 12, left: 12, bottom: 12, right: 12)
         control.tintColor = UIColor.black.withAlphaComponent(0.45)
     }
-    
-    
-    
-    
 }

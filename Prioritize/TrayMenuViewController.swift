@@ -8,15 +8,18 @@
 
 import UIKit
 
-protocol TrayMenuDelegate {
+@objc protocol TrayMenuDelegate {
     //Implement layoutIfNeeded() in controller containing this tray menu
     func updateLayout()
-    func stateChanged(state:TrayMenuState)
-    func verticalPosition(_ y:CGFloat)
+    
+    @objc optional func stateChanged(state:TrayMenuState)
+    
+    @objc optional func verticalPosition(_ y:CGFloat)
 }
 
-enum TrayMenuState {
-    case opened, closed
+@objc enum TrayMenuState: Int {
+    case opened = 1
+    case closed = 0
 }
 
 enum TrayMenuStyle {
@@ -68,7 +71,7 @@ class TrayMenuViewController: UIViewController {
         return view
     }()
     
-
+    
     private var trayOpenedMargin:CGFloat = 100.0
     private var trayClosedHeight:CGFloat = 100.0
     private var trayClosed:CGFloat!
@@ -76,7 +79,7 @@ class TrayMenuViewController: UIViewController {
     private var trayHidden:CGFloat!
     private var cornerRadius:CGFloat = 10
     @objc weak var constraint:NSLayoutConstraint!
-    var delegate:TrayMenuDelegate!
+    weak var delegate:TrayMenuDelegate! // Remember to always make it WEAK reference
     private var trayOriginalCenter:CGFloat!
     private var possibleDirectionState:IndicatorDirection = .downwards {
         didSet {
@@ -85,13 +88,14 @@ class TrayMenuViewController: UIViewController {
     }
     public var state:TrayMenuState = .closed {
         didSet {
-            delegate.stateChanged(state: state)
+            
+            delegate.stateChanged?(state: state)
+            
             if state == .opened {
                 possibleDirectionState = style == .top ? .upwards : .downwards
             } else {
                 possibleDirectionState = style == .top ? .downwards : .upwards
             }
-            
         }
     }
     private var style:TrayMenuStyle = .top
@@ -100,6 +104,8 @@ class TrayMenuViewController: UIViewController {
     fileprivate var itemsPerRow:CGFloat = 4
     public weak var dimView:DimView!
     private var vibrancyView:UIVisualEffectView!
+    
+    
     
     enum IndicatorDirection {
         case downwards, upwards
@@ -119,7 +125,7 @@ class TrayMenuViewController: UIViewController {
         let blur = UIBlurEffect(style: .extraLight)
         let blurView = UIVisualEffectView(effect: blur)
         blurView.frame = view.frame
-        blurView.backgroundColor = UIColor.black.withAlphaComponent(0.1)
+        //blurView.backgroundColor = UIColor.black.withAlphaComponent(0.1)
         view.addSubview(blurView)
         
         let vibrancy = UIVibrancyEffect(blurEffect: blur)
@@ -132,6 +138,10 @@ class TrayMenuViewController: UIViewController {
         vibrancyView.contentView.addSubview(container)
         
         blurView.contentView.addSubview(vibrancyView)
+    }
+    
+    deinit {
+        print("💾 TrayMenuViewController deinitialized...")
     }
 
     override func didReceiveMemoryWarning() {
@@ -407,6 +417,11 @@ class TrayMenuViewController: UIViewController {
     }
 }
 
+
+// ⚡️ EXTENSIONS
+
+
+
 extension TrayMenuViewController:UICollectionViewDataSource {
     func numberOfSections(in collectionView: UICollectionView) -> Int {
         return 1
@@ -446,12 +461,4 @@ extension TrayMenuViewController:UICollectionViewDelegateFlowLayout {
         
         return containerInsets
     }
-    
-    
-    
-    
-    
-  
-    
-    
 }

@@ -8,7 +8,7 @@
 
 import UIKit
 
-class ObjectivesDetailsViewController: UIViewController {
+class ModerateTasksViewController: UIViewController {
     @IBAction func handleDismissButton(_ sender: UIButton) {
         self.dismiss(animated: true, completion: nil)
     }
@@ -17,6 +17,10 @@ class ObjectivesDetailsViewController: UIViewController {
         super.viewDidLoad()
 
         // Do any additional setup after loading the view.
+    }
+    
+    deinit {
+        print("💾 ModerateTasksViewController deinitialized...")
     }
 
     override func didReceiveMemoryWarning() {

@@ -72,10 +72,10 @@
             </objects>
             <point key="canvasLocation" x="1413.5999999999999" y="-756.07196401799104"/>
         </scene>
-        <!--Aims Details View Controller-->
+        <!--Urgent Tasks View Controller-->
         <scene sceneID="dVT-DG-vOc">
             <objects>
-                <viewController id="VY5-dz-NxG" customClass="AimsDetailsViewController" customModule="Prioritize" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="VY5-dz-NxG" customClass="UrgentTasksViewController" customModule="Prioritize" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="5TD-4y-CKV"/>
                         <viewControllerLayoutGuide type="bottom" id="KWF-qK-eao"/>
@@ -84,8 +84,8 @@
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Aims" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="nk2-aF-wTT">
-                                <rect key="frame" x="168" y="323" width="38" height="21"/>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Urgent Tasks" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="nk2-aF-wTT">
+                                <rect key="frame" x="136.5" y="323" width="101" height="21"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="21" id="xLE-SW-Bnn"/>
                                 </constraints>
@@ -135,10 +135,10 @@
             </objects>
             <point key="canvasLocation" x="628" y="155.17241379310346"/>
         </scene>
-        <!--Targets Details View Controller-->
+        <!--Optional Tasks View Controller-->
         <scene sceneID="zzI-xQ-aHZ">
             <objects>
-                <viewController id="s2D-Wm-6Nt" customClass="TargetsDetailsViewController" customModule="Prioritize" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="s2D-Wm-6Nt" customClass="OptionalTasksViewController" customModule="Prioritize" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="jWo-Xz-WzN"/>
                         <viewControllerLayoutGuide type="bottom" id="O0d-X2-icl"/>
@@ -147,8 +147,8 @@
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Targets" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="BSA-Gs-mfD">
-                                <rect key="frame" x="159" y="323" width="57.5" height="21"/>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Optional tasks" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="BSA-Gs-mfD">
+                                <rect key="frame" x="133" y="323" width="109.5" height="21"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
@@ -177,10 +177,10 @@
             </objects>
             <point key="canvasLocation" x="2180" y="154.27286356821591"/>
         </scene>
-        <!--Objectives Details View Controller-->
+        <!--Moderate Tasks View Controller-->
         <scene sceneID="Vbx-dj-bEz">
             <objects>
-                <viewController id="3R2-x3-as6" customClass="ObjectivesDetailsViewController" customModule="Prioritize" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="3R2-x3-as6" customClass="ModerateTasksViewController" customModule="Prioritize" customModuleProvider="target" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="pbN-cN-z6r"/>
                         <viewControllerLayoutGuide type="bottom" id="ygF-r2-X4d"/>
@@ -189,8 +189,8 @@
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Objectives" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="RqD-lU-b8T">
-                                <rect key="frame" x="147" y="323" width="81.5" height="21"/>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Moderate tasks" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="RqD-lU-b8T">
+                                <rect key="frame" x="128.5" y="323" width="118.5" height="21"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="21" id="t8C-tj-g6z"/>
                                 </constraints>
