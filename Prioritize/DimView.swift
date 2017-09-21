@@ -35,7 +35,7 @@ class DimView: UIView {
         self.alpha = 0.0
         view.insertSubview(self, belowSubview: tray)
         setMask(with: tray.frame, in: self)
-        setUpConstraints(in: view, forTrayView: tray, withStyle: style)
+        //setUpConstraints(in: view, forTrayView: tray, withStyle: style)
     }
     
     required init?(coder aDecoder: NSCoder) {

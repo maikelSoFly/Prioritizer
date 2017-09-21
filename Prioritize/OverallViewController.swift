@@ -10,7 +10,6 @@ import UIKit
 
 class OverallViewController: UIViewController {
     @IBOutlet weak var priorityCircleOverallView: PriorityCircleOverallView!
-    @IBOutlet weak var menuBarTopConstraint: NSLayoutConstraint!
     @IBOutlet weak var menuBarView: UIView!
     
     fileprivate var menuBar:TrayMenuViewController!
@@ -56,17 +55,24 @@ class OverallViewController: UIViewController {
         
         /// Initializing Task Splitter.
         view.bringSubview(toFront: priorityCircleOverallView)
+        priorityCircleOverallView.isUserInteractionEnabled = true
         priorityCircleOverallView.delegate = self
         taskSplitter = TaskSplitter(title: "Main Task Splitter", priorityCircleColors: UIColor.defaultAppColors())
         priorityCircleOverallView.setUp(for: taskSplitter!)
+        
         
         /// Tray menu.
         view.bringSubview(toFront: menuBarView)
     
 //🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰
 //   Process of adding Tray Menu with buttons and dim.
+        
+        /// Dim View
+        dimView = DimView(in: self.view, forTrayView: menuBarView, withStyle: .top)
+        menuBar.dimView = dimView
+        dimView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(respondToDimViewTap(sender:))))
 
-        menuBar.setUpView(trayOpenedHeight: 250, trayClosedHeight: 100, constraint: menuBarTopConstraint, style: .top)
+        menuBar.setUpView(trayOpenedHeight: 250, superview: menuBarView, trayClosedHeight: 100, style: .top)
 
         let btn1 = TrayMenuButton(image: #imageLiteral(resourceName: "add"), description: "Add Task")
         let btn2 = TrayMenuButton(image: #imageLiteral(resourceName: "flame"), description: "Hot")
@@ -85,13 +91,6 @@ class OverallViewController: UIViewController {
         btn1.addTarget(self, action: #selector(addTask(sender:)), for: .touchUpInside)
         // ...
 
-        
-        /// Dim View
-
-        dimView = DimView(in: self.view, forTrayView: menuBarView, withStyle: .top)
-        menuBar.dimView = dimView
-        dimView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(respondToDimViewTap(sender:))))
-
 //🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰
         
 
@@ -101,6 +100,10 @@ class OverallViewController: UIViewController {
 
     deinit {
         print("💾 OverallViewController deinitialized...")
+    }
+    
+    @objc func test(sender:UITapGestureRecognizer) {
+        print("kurwaaa")
     }
     
     @objc func updateTimer(timer:Timer) {

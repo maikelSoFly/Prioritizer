@@ -21,6 +21,7 @@ import UIKit
     case opened = 1
     case closed = 0
     case expanded = 2
+    case hidden = 3
 }
 
 enum TrayMenuStyle {
@@ -73,16 +74,16 @@ class TrayMenuViewController: UIViewController {
     }()
     
     
-    private var trayOpenedMargin:CGFloat = 100.0
+    private var trayOpenedHeight:CGFloat = 100.0
     private var trayClosedHeight:CGFloat = 100.0
-    private var trayClosed:CGFloat!
-    private var trayOpened:CGFloat!
-    private var trayHidden:CGFloat!
-    private var trayFullyExpanded:CGFloat = -5.0
+    private var trayClosed:CGPoint!
+    private var trayOpened:CGPoint!
+    private var trayHidden:CGPoint!
+    private var trayFullyExpanded:CGPoint!
     private var cornerRadius:CGFloat = 10
     weak var constraint:NSLayoutConstraint!
     weak var delegate:TrayMenuDelegate! // Remember to always make it WEAK reference
-    private var trayOriginalCenter:CGFloat!
+    private var trayOriginalCenter:CGPoint!
     private var possibleDirectionState:IndicatorDirection = .downwards {
         didSet {
             changeDirectionIndicator()
@@ -113,6 +114,7 @@ class TrayMenuViewController: UIViewController {
             container.reloadData()
         }
     }
+    private var mySuperview:UIView!
     
     
     enum IndicatorDirection {
@@ -129,6 +131,7 @@ class TrayMenuViewController: UIViewController {
         super.viewDidLoad()
         view.layer.cornerRadius = cornerRadius
         view.layer.masksToBounds = true
+        
         
         let blur = UIBlurEffect(style: .extraLight)
         let blurView = UIVisualEffectView(effect: blur)
@@ -147,10 +150,15 @@ class TrayMenuViewController: UIViewController {
         
         blurView.contentView.addSubview(vibrancyView)
         view.addGestureRecognizer(UIPanGestureRecognizer(target: self, action: #selector(self.respondToPan(sender:))))
+        view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(tap(sender:))))
     }
     
     deinit {
         print("💾 TrayMenuViewController deinitialized...")
+    }
+    
+    @objc func tap(sender:UITapGestureRecognizer) {
+        print("tap pn tray")
     }
 
     override func didReceiveMemoryWarning() {
@@ -158,27 +166,30 @@ class TrayMenuViewController: UIViewController {
         // Dispose of any resources that can be recreated.
     }
     
-    func setUpView(trayOpenedHeight:CGFloat, trayClosedHeight:CGFloat, constraint:NSLayoutConstraint!, style:TrayMenuStyle) {
-        self.trayOpenedMargin = view.frame.height - trayOpenedHeight
+    
+    func setUpView(trayOpenedHeight:CGFloat, superview:UIView, trayClosedHeight:CGFloat, style:TrayMenuStyle) {
+        self.mySuperview = superview
+        self.trayFullyExpanded = mySuperview.center
+        self.trayOpenedHeight = trayOpenedHeight
         self.trayClosedHeight = trayClosedHeight
-        self.constraint = constraint
+        
         self.style = style
         //Top style
         if style == .top {
-            self.constraint.constant = -view.frame.height + trayClosedHeight
+            trayHidden = CGPoint(x: superview.center.x, y: superview.center.y - view.frame.height)
+            trayOpened = CGPoint(x: superview.center.x, y: superview.center.y - (view.frame.height - trayOpenedHeight))
+            trayClosed = CGPoint(x: superview.center.x, y: superview.center.y - (view.frame.height - trayClosedHeight))
             
-            trayHidden = -view.frame.height
-            trayOpened = -trayOpenedMargin
-            
-            trayClosed = constraint.constant
+            setCenter(trayClosed)
             layoutControlls()
         } else { //Bottom style
             possibleDirectionState = .upwards
-            self.constraint.constant = -view.frame.height + trayClosedHeight
             
-            trayHidden = -view.frame.height
-            trayOpened = -trayOpenedMargin
-            trayClosed = constraint.constant
+            trayHidden = CGPoint(x: superview.center.x, y: superview.center.y + view.frame.height)
+            trayOpened = CGPoint(x: superview.center.x, y: superview.center.y + (view.frame.height - trayOpenedHeight))
+            trayClosed = CGPoint(x: superview.center.x, y: superview.center.y + (view.frame.height - trayClosedHeight))
+
+            setCenter(trayClosed)
             layoutControlls()
         }
         
@@ -210,7 +221,7 @@ class TrayMenuViewController: UIViewController {
             
             //Container constraints
             let containerConstraints:[NSLayoutConstraint] = [
-                container.topAnchor.constraint(equalTo: view.topAnchor, constant: -self.trayOpened),
+                container.topAnchor.constraint(equalTo: view.topAnchor, constant: (view.frame.height - trayOpenedHeight)),
                 container.bottomAnchor.constraint(equalTo: label.topAnchor),
                 container.leadingAnchor.constraint(equalTo: view.leadingAnchor),
                 container.trailingAnchor.constraint(equalTo: view.trailingAnchor)
@@ -232,7 +243,7 @@ class TrayMenuViewController: UIViewController {
             
             let containerConstraints:[NSLayoutConstraint] = [
                 container.topAnchor.constraint(equalTo: label.bottomAnchor),
-                container.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: self.trayOpened),
+                container.bottomAnchor.constraint(equalTo: view.bottomAnchor, constant: -(view.frame.height - trayOpenedHeight)),
                 container.leadingAnchor.constraint(equalTo: view.leadingAnchor),
                 container.trailingAnchor.constraint(equalTo: view.trailingAnchor)
             ]
@@ -240,17 +251,16 @@ class TrayMenuViewController: UIViewController {
         }
     }
     
-    
     @objc func respondToPan(sender:UIPanGestureRecognizer) {
         let translation = sender.translation(in: view)
         let velocity = sender.velocity(in: view)
         switch sender.state {
         case .began:
-            trayOriginalCenter = constraint.constant
+            trayOriginalCenter = mySuperview.center
             break
         case .changed:
             move(with: translation)
-            trayOriginalCenter = constraint.constant
+            trayOriginalCenter = mySuperview.center
             break
         case .ended:
             stickToBound(with: velocity)
@@ -261,12 +271,25 @@ class TrayMenuViewController: UIViewController {
         sender.setTranslation(.zero, in: view)
     }
     
+    func setCenter(_ center:CGPoint) {
+        mySuperview.center = center
+        
+        if style == .top {
+            if let dim = dimView {
+                dim.frame.origin = mySuperview.frame.origin
+            }
+        } else {
+            if let dim = dimView {
+                dim.frame.origin = CGPoint(x: mySuperview.frame.origin.x, y: mySuperview.frame.origin.y - UIScreen.main.bounds.height)
+            }
+        }
+    }
+    
     func use() {
         if state == .expanded {
-            constraint.constant = trayOpened
             
             UIView.animate(withDuration: 0.3, delay: 0, options: .curveEaseInOut, animations: {
-                self.delegate.updateLayout()
+                self.setCenter(self.trayOpened)
                 self.container.alpha = 1.0
             }, completion: { (success) in
                 self.state = .opened
@@ -279,10 +302,8 @@ class TrayMenuViewController: UIViewController {
         if state == .closed {
             //  OPEN
     
-            self.constraint.constant = trayOpened
-            
             UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 0.5, initialSpringVelocity: 3, options: .curveEaseInOut, animations: {
-                self.delegate.updateLayout()
+                self.setCenter(self.trayOpened)
                 self.container.alpha = 1.0
                 if self.dimView != nil {
                     self.dimView.alpha = 0.35
@@ -293,9 +314,9 @@ class TrayMenuViewController: UIViewController {
             
         } else {
             //  CLOSE
-            self.constraint.constant = trayClosed
+            
             UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 0.5, initialSpringVelocity: 3, options: .curveEaseInOut, animations: {
-                self.delegate.updateLayout()
+                self.setCenter(self.trayClosed)
                 self.container.alpha = 0.0
                 if self.dimView != nil {
                     self.dimView.alpha = 0.0
@@ -308,41 +329,37 @@ class TrayMenuViewController: UIViewController {
     
     func move(with translation:CGPoint) {
         if style == .top {
-            self.constraint.constant = (-view.frame.height + trayClosedHeight ... -(cornerRadius * 0.5)).clamp(trayOriginalCenter + translation.y)
+            let y = (trayClosed.y ... trayFullyExpanded.y).clamp(trayOriginalCenter.y + translation.y)
+            mySuperview.center = CGPoint(x: mySuperview.center.x, y: y)
         } else {
-            self.constraint.constant = (trayClosed ... -(cornerRadius * 0.5)).clamp(trayOriginalCenter - translation.y)
+            let y = (trayFullyExpanded.y ... trayClosed.y).clamp(trayOriginalCenter.y + translation.y)
+            mySuperview.center = CGPoint(x: mySuperview.center.x, y: y)
         }
         
+        if state == .expanded && mySuperview.center.y <= trayOpened.y {
+            state = .opened
+        }
+
         
+        // Fading dim view if exists
+        if let dim = dimView {
+            dim.frame.origin = style == .bottom ? CGPoint(x: mySuperview.frame.origin.x, y: mySuperview.frame.origin.y - UIScreen.main.bounds.height) : mySuperview.frame.origin
+            dim.alpha = (0 ... 0.35).clamp((mySuperview.center.y - trayClosed.y).remap(from1: 0, to1: trayOpened.y - trayClosed.y, from2: 0, to2: 0.35))
+        }
         
-//        if constraint.constant <= trayOpened {
-//            state = .opened
-//        } else {
-//            state = .expanded
-//        }
-//
-//        // Fading dim view if exists
-//        if dimView != nil {
-//            dimView.alpha = (0 ... 0.35).clamp((self.constraint.constant - trayClosed).remap(from1: 0, to1: trayOpened - trayClosed, from2: 0, to2: 0.35))
-//        }
-//        
-//        // Fading the container
-//        if state != .expanded {
-//            container.alpha = (0 ... 1.0).clamp((self.constraint.constant - trayClosed).remap(from1: 0, to1: trayOpened - trayClosed, from2: 0, to2: 1.0))
-//        }
+        // Fading the container
+        if state != .expanded {
+            container.alpha = (0 ... 1.0).clamp((mySuperview.center.y - trayClosed.y).remap(from1: 0, to1: trayOpened.y - trayClosed.y, from2: 0, to2: 1.0))
+        }
     }
     
     
     func stickToBound(with velocity:CGPoint)  {
-        
-        
         if state == .expanded {
-            let time = (0.1 ... 0.3).clamp(abs((trayOpened - self.constraint.constant) / velocity.y))
-            
-            constraint.constant = trayOpened
-            
+            let time = (0.1 ... 0.3).clamp(abs((trayOpened.y - mySuperview.center.y) / velocity.y))
+        
             UIView.animate(withDuration: TimeInterval(time), delay: 0, options: .curveEaseInOut, animations: {
-                self.delegate.updateLayout()
+                self.setCenter(self.trayOpened)
                 self.container.alpha = 1.0
             }, completion: { (success) in
                 self.state = .opened
@@ -353,12 +370,10 @@ class TrayMenuViewController: UIViewController {
         
         let multiplier:CGFloat = style == .top ? 1 : -1
         if multiplier * velocity.y > 0 {
-            let time = (0.3 ... 0.6).clamp(abs((self.constraint.constant - trayOpened) / velocity.y))
-            
-            self.constraint.constant = trayOpened
+            let time = (0.3 ... 0.6).clamp(abs((mySuperview.center.y - trayOpened.y) / velocity.y))
             
             UIView.animate(withDuration: TimeInterval(time), delay: 0, usingSpringWithDamping: 0.5, initialSpringVelocity: 3, options: .curveEaseOut, animations: {
-                self.delegate.updateLayout()
+                self.setCenter(self.trayOpened)
                 self.container.alpha = 1.0
                 if self.dimView != nil {
                     self.dimView.alpha = 0.35
@@ -367,12 +382,11 @@ class TrayMenuViewController: UIViewController {
                 self.state = .opened
             })
         } else {
-            let time = (0.3 ... 0.6).clamp(abs((self.constraint.constant - trayClosed) / velocity.y))
+            let time = (0.3 ... 0.6).clamp(abs((mySuperview.center.y - trayClosed.y) / velocity.y))
             
-            self.constraint.constant = trayClosed
             
             UIView.animate(withDuration: TimeInterval(time), delay: 0, usingSpringWithDamping: 0.5, initialSpringVelocity: 3, options: .curveEaseOut, animations: {
-                self.delegate.updateLayout()
+                self.setCenter(self.trayClosed)
                 self.container.alpha = 0.0
                 if self.dimView != nil {
                     self.dimView.alpha = 0.0
@@ -394,40 +408,36 @@ class TrayMenuViewController: UIViewController {
             print("❗Tried to show already visible menuBar")
             return
         }
-
-        if !boolean {
-            view.isHidden = false
-            self.constraint.constant = trayClosed
-        } else {
-            self.constraint.constant = trayHidden
-            if self.dimView != nil {
-                self.dimView.alpha = 0.0
-            }
-        }
-
+        
         if animated {
-            UIView.animate(withDuration: 0.2, delay: 0, options: .curveEaseInOut, animations: {
-                self.delegate.updateLayout()
-            }, completion: { (success) in
-                if boolean {
-                    self.possibleDirectionState = self.style == .top ? .downwards : .upwards
-                    self.changeDirectionIndicator()
-                    self.view.isHidden = true
+            if boolean { /// Animated hiding.
+                UIView.animate(withDuration: 0.1, delay: 0, options: .curveEaseInOut, animations: { 
+                    self.setCenter(self.trayHidden)
+                    if let dim = self.dimView {
+                        dim.alpha = 0.0
+                    }
                     self.container.alpha = 0.0
-                }
-            })
+                }, completion: { (success) in
+                    self.view.isHidden = true
+                    self.state = .hidden
+                })
+            } else { /// Animated showing.
+                view.isHidden = false
+                UIView.animate(withDuration: 0.2, delay: 0.1, options: .curveEaseInOut, animations: {
+                    self.setCenter(self.trayClosed)
+                }, completion: { (success) in
+                    self.state = .closed
+                })
+            }
+            
         } else {
-            self.delegate.updateLayout()
-            if boolean {
-                self.possibleDirectionState = style == .top ? .downwards : .upwards
-                self.changeDirectionIndicator()
-                self.view.isHidden = true
-                self.container.alpha = 0.0
-                if self.dimView != nil {
-                    self.dimView.alpha = 0.0
-                }
+            if boolean { /// Non-animated hiding.
+                
+            } else { /// Non-animated showing.
+                
             }
         }
+
     }
     
     
@@ -465,10 +475,8 @@ class TrayMenuViewController: UIViewController {
     }
     
     func expand() {
-        constraint.constant = trayFullyExpanded
-        
         UIView.animate(withDuration: 0.3, delay: 0, options: .curveEaseInOut, animations: { 
-            self.delegate.updateLayout()
+            self.setCenter(self.trayFullyExpanded)
             self.container.alpha = 0.0
         }, completion: { (success) in
             self.state = .expanded

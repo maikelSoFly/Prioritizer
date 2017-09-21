@@ -12,7 +12,6 @@ class UrgentTasksViewController: UIViewController {
     @IBAction func handleDissmisButton(_ sender: UIButton) {
         self.dismiss(animated: true, completion: nil)
     }
-    @IBOutlet weak var menuViewBottomConstraint: NSLayoutConstraint!
     @IBOutlet weak var trayMenuView: UIView!
     
     @IBOutlet weak var label: UILabel!
@@ -23,9 +22,16 @@ class UrgentTasksViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.layer.masksToBounds = true
-
-        trayMenuViewController.setUpView(trayOpenedHeight: 200, trayClosedHeight: 80, constraint: menuViewBottomConstraint, style: .bottom)
         
+        
+        // Dim View
+        
+        dimView = DimView(in: self.view, forTrayView: trayMenuView, withStyle: .bottom)
+        trayMenuViewController.dimView = dimView
+        dimView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(respondToDimViewTap(sender:))))
+        
+        
+        trayMenuViewController.setUpView(trayOpenedHeight: 200, superview: trayMenuView, trayClosedHeight: 80, style: .bottom)
         
         let btn5 = TrayMenuButton(image: #imageLiteral(resourceName: "image"), description: "Images")
         let btn6 = TrayMenuButton(image: #imageLiteral(resourceName: "lens"), description: "Camera")
@@ -35,10 +41,7 @@ class UrgentTasksViewController: UIViewController {
         trayMenuViewController.setUpContainer(insets: UIEdgeInsets(top: 20, left: 30, bottom: 25, right: 30), itemsPerRow: 4)
         trayMenuViewController.addControls(controls: [btn5, btn6, btn7, btn8])
         
-        // Dim View
-        dimView = DimView(in: self.view, forTrayView: trayMenuView, withStyle: .bottom)
-        trayMenuViewController.dimView = dimView
-        dimView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(respondToDimViewTap(sender:))))
+        
     }
     
     deinit {

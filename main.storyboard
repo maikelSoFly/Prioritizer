@@ -37,11 +37,9 @@
                                     <action selector="handleTestButton:" destination="tq0-oQ-BMj" eventType="touchUpInside" id="94M-aW-Pf1"/>
                                 </connections>
                             </button>
-                            <containerView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="tqJ-Sz-taa">
+                            <containerView contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="tqJ-Sz-taa">
                                 <rect key="frame" x="0.0" y="0.0" width="375" height="400"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="400" id="tbK-IL-wW4"/>
-                                </constraints>
+                                <autoresizingMask key="autoresizingMask" flexibleMinX="YES" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <connections>
                                     <segue destination="pme-wf-q3y" kind="embed" identifier="TrayMenuSegue" id="J8R-ha-4h9"/>
                                 </connections>
@@ -51,15 +49,11 @@
                         <constraints>
                             <constraint firstAttribute="trailing" secondItem="zc2-zw-n1F" secondAttribute="trailing" id="5Py-AR-9Xq"/>
                             <constraint firstItem="zc2-zw-n1F" firstAttribute="leading" secondItem="hPz-yk-vNG" secondAttribute="leading" id="9t8-wF-zoH"/>
-                            <constraint firstItem="tqJ-Sz-taa" firstAttribute="top" secondItem="hPz-yk-vNG" secondAttribute="top" id="D0a-Gw-PdX"/>
-                            <constraint firstAttribute="trailing" secondItem="tqJ-Sz-taa" secondAttribute="trailing" id="ZpS-JV-px1"/>
-                            <constraint firstItem="tqJ-Sz-taa" firstAttribute="leading" secondItem="hPz-yk-vNG" secondAttribute="leading" id="kVp-Ng-QZl"/>
                             <constraint firstItem="zc2-zw-n1F" firstAttribute="centerY" secondItem="hPz-yk-vNG" secondAttribute="centerY" id="sQp-cR-E3W"/>
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" id="blJ-IY-wG6"/>
                     <connections>
-                        <outlet property="menuBarTopConstraint" destination="D0a-Gw-PdX" id="HX0-pq-CVC"/>
                         <outlet property="menuBarView" destination="tqJ-Sz-taa" id="9CG-vA-Mtf"/>
                         <outlet property="priorityCircleOverallView" destination="zc2-zw-n1F" id="cnL-9x-Ykb"/>
                         <outlet property="testButton" destination="zf6-ea-iYs" id="6bS-Mo-1os"/>
@@ -104,11 +98,9 @@
                                     <action selector="handleDissmisButton:" destination="VY5-dz-NxG" eventType="touchUpInside" id="HrD-Fv-Rwn"/>
                                 </connections>
                             </button>
-                            <containerView opaque="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="TaG-Ks-LwP">
+                            <containerView opaque="NO" contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="TaG-Ks-LwP">
                                 <rect key="frame" x="0.0" y="323" width="375" height="344"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="344" id="fxc-M6-wKs"/>
-                                </constraints>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <connections>
                                     <segue destination="dwm-3b-VZP" kind="embed" identifier="AimsTrayMenuSegue" id="uaZ-hJ-9hv"/>
                                 </connections>
@@ -117,9 +109,6 @@
                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                         <constraints>
                             <constraint firstItem="KWF-qK-eao" firstAttribute="top" secondItem="n7M-7r-G4r" secondAttribute="bottom" constant="257" id="BXA-T8-7ic"/>
-                            <constraint firstItem="TaG-Ks-LwP" firstAttribute="leading" secondItem="g8o-dI-4be" secondAttribute="leading" id="jnC-k9-A8W"/>
-                            <constraint firstAttribute="trailing" secondItem="TaG-Ks-LwP" secondAttribute="trailing" id="tIh-hY-NYn"/>
-                            <constraint firstItem="KWF-qK-eao" firstAttribute="top" secondItem="TaG-Ks-LwP" secondAttribute="bottom" id="thj-0L-w5B"/>
                             <constraint firstItem="nk2-aF-wTT" firstAttribute="centerX" secondItem="g8o-dI-4be" secondAttribute="centerX" id="wrA-7w-3uD"/>
                             <constraint firstItem="n7M-7r-G4r" firstAttribute="centerX" secondItem="g8o-dI-4be" secondAttribute="centerX" id="z9X-Lh-3sQ"/>
                             <constraint firstItem="nk2-aF-wTT" firstAttribute="centerY" secondItem="g8o-dI-4be" secondAttribute="centerY" id="zMK-57-oSS"/>
@@ -128,7 +117,6 @@
                     </view>
                     <connections>
                         <outlet property="label" destination="nk2-aF-wTT" id="ieW-T6-27o"/>
-                        <outlet property="menuViewBottomConstraint" destination="thj-0L-w5B" id="Ayh-Lh-dfv"/>
                         <outlet property="trayMenuView" destination="TaG-Ks-LwP" id="l0X-Th-RmN"/>
                     </connections>
                 </viewController>
