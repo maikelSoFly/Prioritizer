@@ -10,7 +10,7 @@ import UIKit
 
 class CircularTransition: NSObject {
     var duration:TimeInterval = 0.1
-    weak var circle:CircleView?
+    weak var circle:CircleView!
     var transitionMode:CircularTransitionMode = .present
     
 
@@ -45,6 +45,23 @@ extension CircularTransition:UIViewControllerAnimatedTransitioning {
                     presentedView.backgroundColor = circle?.backgroundColor
                     containerView.addSubview(presentedView)
                     
+                    /// Inverting colors of target view controller's views based on background color.
+                    switch circle.taskType {
+                    case .optional:
+                        (transitionContext.viewController(forKey: .to) as? OptionalTasksViewController)?.makeViewsVisibleAgainstBackground(color: (circle.backgroundColor)!)
+                        break
+                    case .moderate:
+                        (transitionContext.viewController(forKey: .to) as? ModerateTasksViewController)?.makeViewsVisibleAgainstBackground(color: circle.backgroundColor!)
+                        break
+                    case .urgent:
+                        (transitionContext.viewController(forKey: .to) as? UrgentTasksViewController)?.makeViewsVisibleAgainstBackground(color: (circle.backgroundColor)!)
+                        break
+                    default:
+                        return
+                    }
+                    
+                    
+                
                     //Setting scale multiplier
                     let displayHeight = UIScreen.main.bounds.size.height
                     let displayWidth = UIScreen.main.bounds.size.width

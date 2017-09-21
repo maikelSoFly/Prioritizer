@@ -53,6 +53,20 @@ extension UIColor {
         
         return UIColor(red: r, green: g, blue: b, alpha: 1.0)
     }
+    
+    func invert() -> UIColor {
+        var red:CGFloat = 0, green:CGFloat = 0, blue:CGFloat = 0, alpha:CGFloat = 0
+        self.getRed(&red, green: &green, blue: &blue, alpha: &alpha)
+        
+        return UIColor(red: 1.0 - red, green: 1.0 - green, blue: 1.0 - blue, alpha: alpha)
+    }
+    
+    func contrastColor() -> UIColor {
+        var white:CGFloat = 0, alpha:CGFloat = 0
+        self.getWhite(&white, alpha: &alpha)
+        
+        return white < 0.5 ? UIColor.white : UIColor.black
+    }
 }
 
 extension ClosedRange {
@@ -68,3 +82,4 @@ extension CGFloat {
         return (self - from1) / (to1 - from1) * (to2 - from2) + from2
     }
 }
+

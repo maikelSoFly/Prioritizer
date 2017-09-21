@@ -15,28 +15,30 @@ class UrgentTasksViewController: UIViewController {
     @IBOutlet weak var menuViewBottomConstraint: NSLayoutConstraint!
     @IBOutlet weak var trayMenuView: UIView!
     
+    @IBOutlet weak var label: UILabel!
     weak var trayMenuViewController:TrayMenuViewController!
     private var dimView:DimView!
+    
 
     override func viewDidLoad() {
         super.viewDidLoad()
         view.layer.masksToBounds = true
-        
+
         trayMenuViewController.setUpView(trayOpenedHeight: 200, trayClosedHeight: 80, constraint: menuViewBottomConstraint, style: .bottom)
+        
         
         let btn5 = TrayMenuButton(image: #imageLiteral(resourceName: "image"), description: "Images")
         let btn6 = TrayMenuButton(image: #imageLiteral(resourceName: "lens"), description: "Camera")
         let btn7 = TrayMenuButton(image: #imageLiteral(resourceName: "bitcoin"), description: "Wallet")
         let btn8 = TrayMenuButton(image: #imageLiteral(resourceName: "profile"), description: "Profile")
         
-        trayMenuViewController.setUpContainer(insets: UIEdgeInsets(top: 30, left: 30, bottom: 10, right: 30), itemsPerRow: 4)
+        trayMenuViewController.setUpContainer(insets: UIEdgeInsets(top: 20, left: 30, bottom: 25, right: 30), itemsPerRow: 4)
         trayMenuViewController.addControls(controls: [btn5, btn6, btn7, btn8])
         
         // Dim View
         dimView = DimView(in: self.view, forTrayView: trayMenuView, withStyle: .bottom)
         trayMenuViewController.dimView = dimView
         dimView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(respondToDimViewTap(sender:))))
-        
     }
     
     deinit {
@@ -44,8 +46,20 @@ class UrgentTasksViewController: UIViewController {
     }
     
     
+    
+    // ⚡️ FUNCTIONS
+    
+    
+    
     @objc func respondToDimViewTap(sender:UITapGestureRecognizer) {
         trayMenuViewController.use()
+    }
+    
+    public func  makeViewsVisibleAgainstBackground(color:UIColor) {
+        let contrastColor = color.contrastColor()
+        label.textColor = contrastColor
+        trayMenuViewController.tintStyle = contrastColor == .white ? .light : .normal
+        
     }
 
     override func didReceiveMemoryWarning() {

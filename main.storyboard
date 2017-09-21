@@ -63,9 +63,9 @@
                         <outlet property="menuBarView" destination="tqJ-Sz-taa" id="9CG-vA-Mtf"/>
                         <outlet property="priorityCircleOverallView" destination="zc2-zw-n1F" id="cnL-9x-Ykb"/>
                         <outlet property="testButton" destination="zf6-ea-iYs" id="6bS-Mo-1os"/>
-                        <segue destination="VY5-dz-NxG" kind="show" identifier="AimsDetailsSegue" id="yGc-hb-WI6"/>
-                        <segue destination="3R2-x3-as6" kind="show" identifier="ObjectivesDetailsSegue" id="KLs-c9-RDK"/>
-                        <segue destination="s2D-Wm-6Nt" kind="show" identifier="TargetsDetailsSegue" id="MD6-Yg-miI"/>
+                        <segue destination="VY5-dz-NxG" kind="show" identifier="UrgentTasksSegue" id="yGc-hb-WI6"/>
+                        <segue destination="3R2-x3-as6" kind="show" identifier="ModerateTasksSegue" id="KLs-c9-RDK"/>
+                        <segue destination="s2D-Wm-6Nt" kind="show" identifier="OptionalTasksSegue" id="MD6-Yg-miI"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="czF-18-IbX" userLabel="First Responder" sceneMemberID="firstResponder"/>
@@ -127,6 +127,7 @@
                         </constraints>
                     </view>
                     <connections>
+                        <outlet property="label" destination="nk2-aF-wTT" id="ieW-T6-27o"/>
                         <outlet property="menuViewBottomConstraint" destination="thj-0L-w5B" id="Ayh-Lh-dfv"/>
                         <outlet property="trayMenuView" destination="TaG-Ks-LwP" id="l0X-Th-RmN"/>
                     </connections>
@@ -172,6 +173,9 @@
                             <constraint firstItem="BSA-Gs-mfD" firstAttribute="centerY" secondItem="GNy-tv-fEF" secondAttribute="centerY" id="w0v-RH-yTa"/>
                         </constraints>
                     </view>
+                    <connections>
+                        <outlet property="label" destination="BSA-Gs-mfD" id="NWY-fx-FzL"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="Gnb-Zp-tPO" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
@@ -218,6 +222,9 @@
                             <constraint firstItem="RqD-lU-b8T" firstAttribute="centerX" secondItem="k6a-w7-Hwa" secondAttribute="centerX" id="nF4-2X-XgH"/>
                         </constraints>
                     </view>
+                    <connections>
+                        <outlet property="label" destination="RqD-lU-b8T" id="xc9-Xv-E0H"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="G10-RA-3BE" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>

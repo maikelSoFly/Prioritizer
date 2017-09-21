@@ -46,7 +46,7 @@ class OverallViewController: UIViewController {
         view.layer.masksToBounds = true
         view.layer.cornerRadius = 5
         
-        // Test button
+        /// Test button
         testButton.backgroundColor = UIColor.white.withAlphaComponent(0.5)
         testButton.layer.cornerRadius = 8
         testButton.layer.masksToBounds = true
@@ -54,13 +54,13 @@ class OverallViewController: UIViewController {
         testButton.titleLabel?.font = UIFont(name: "Helvetica-Bold", size: 12)
         
         
-        // Initializing Task Splitter.
+        /// Initializing Task Splitter.
         view.bringSubview(toFront: priorityCircleOverallView)
         priorityCircleOverallView.delegate = self
         taskSplitter = TaskSplitter(title: "Main Task Splitter", priorityCircleColors: UIColor.defaultAppColors())
         priorityCircleOverallView.setUp(for: taskSplitter!)
         
-        // Tray menu.
+        /// Tray menu.
         view.bringSubview(toFront: menuBarView)
     
 //🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰
@@ -68,7 +68,7 @@ class OverallViewController: UIViewController {
 
         menuBar.setUpView(trayOpenedHeight: 250, trayClosedHeight: 100, constraint: menuBarTopConstraint, style: .top)
 
-        let btn1 = TrayMenuButton(image: #imageLiteral(resourceName: "box"), description: "Folders")
+        let btn1 = TrayMenuButton(image: #imageLiteral(resourceName: "add"), description: "Add Task")
         let btn2 = TrayMenuButton(image: #imageLiteral(resourceName: "flame"), description: "Hot")
         let btn3 = TrayMenuButton(image: #imageLiteral(resourceName: "shuffle"), description: "Shuffle")
         let btn4 = TrayMenuButton(image: #imageLiteral(resourceName: "burger"), description: "Meal")
@@ -79,12 +79,14 @@ class OverallViewController: UIViewController {
         let arr = [btn1, btn2, btn3, btn4, btn5, btn6, btn7, btn8]
 
         menuBar.addControls(controls: arr)
+        
+        /// Button targets
+        
+        btn1.addTarget(self, action: #selector(addTask(sender:)), for: .touchUpInside)
+        // ...
 
-        for btn in arr {
-            btn.addTarget(self, action: #selector(test(sender:)), for: .touchUpInside)
-        }
-
-        // Dim View
+        
+        /// Dim View
 
         dimView = DimView(in: self.view, forTrayView: menuBarView, withStyle: .top)
         menuBar.dimView = dimView
@@ -93,13 +95,10 @@ class OverallViewController: UIViewController {
 //🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰
         
 
-        // Scheduled Timer
+        /// Scheduled Timer
         timer = Timer.scheduledTimer(timeInterval: timerInterval, target: self, selector: #selector(self.updateTimer(timer:)), userInfo: nil, repeats: true)
-        //timer.invalidate()
-        
-        addTasks()
     }
-    
+
     deinit {
         print("💾 OverallViewController deinitialized...")
     }
@@ -110,17 +109,16 @@ class OverallViewController: UIViewController {
         taskSplitter?.reloadData(for: .optional)
         taskSplitter?.reloadData(for: .moderate)
         taskSplitter?.reloadData(for: .urgent)
-        print("\n")
-        
     }
     
     @objc func respondToDimViewTap(sender:UITapGestureRecognizer) {
         menuBar.use()
     }
     
-    @objc func test(sender:TrayMenuButton) {
-        print("🍏", sender.buttonDescription)
+    @objc func addTask(sender:TrayMenuButton) {
+        menuBar.expand()
     }
+    
     
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
@@ -134,31 +132,13 @@ class OverallViewController: UIViewController {
             return
         }
         
-        // For circular transision
+        /// For circular transision
         let vc = segue.destination
         vc.transitioningDelegate = self
         vc.modalPresentationStyle = .custom
     }
     
-    private func addTasks() {
-        let formatter = DateFormatter()
-        formatter.dateFormat = "yyyy/MM/dd HH:mm"
-        
-        let date1 = formatter.date(from: "2017/09/20 14:45")
-        let duration1 = Measurement<UnitDuration>(value: 10, unit: .minutes)
-        let task1 = Task(title: "test1", description: "test1", priority: .low, deadline: date1!, maxRealizationTime: duration1)
-        
-        
-        let date2 = formatter.date(from: "2017/09/20 14:40")
-        let duration2 = Measurement<UnitDuration>(value: 5, unit: .minutes)
-        let task2 = Task(title: "test2", description: "test2", priority: .normal, deadline: date2!, maxRealizationTime: duration2)
-        
-        let date3 = formatter.date(from: "2017/09/20 15:00")
-        let duration3 = Measurement<UnitDuration>(value: 30, unit: .minutes)
-        let task3 = Task(title: "test3", description: "test3", priority: .high, deadline: date3!, maxRealizationTime: duration3)
-        
-        taskSplitter?.addTasks([task1, task2, task3])
-    }
+    
 }
 
 
@@ -174,13 +154,13 @@ extension OverallViewController:PriorityCircleOverallDelegate {
         
         switch type {
         case .urgent:
-            performSegue(withIdentifier: "AimsDetailsSegue", sender: self)
+            performSegue(withIdentifier: "UrgentTasksSegue", sender: self)
             break
         case .moderate:
-            performSegue(withIdentifier: "ObjectivesDetailsSegue", sender: self)
+            performSegue(withIdentifier: "ModerateTasksSegue", sender: self)
             break
         case .optional:
-            performSegue(withIdentifier: "TargetsDetailsSegue", sender: self)
+            performSegue(withIdentifier: "OptionalTasksSegue", sender: self)
             break
         default:
             print("❗Tapped on circle of type: none")
@@ -188,7 +168,6 @@ extension OverallViewController:PriorityCircleOverallDelegate {
     }
     
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
-        
         if UIDevice.current.orientation.isLandscape {
             menuBar.hideMenuBar(true, animated: true)
         } else {
@@ -201,7 +180,7 @@ extension OverallViewController:PriorityCircleOverallDelegate {
 extension OverallViewController:UIViewControllerTransitioningDelegate {
     func animationController(forDismissed dismissed: UIViewController) -> UIViewControllerAnimatedTransitioning? {
         
-        // Init code before dismissing view.
+        /// Init code before dismissing view.
         menuBar.hideMenuBar(false, animated: true)
         transition.transitionMode = .dismiss
         
@@ -210,7 +189,7 @@ extension OverallViewController:UIViewControllerTransitioningDelegate {
     
     func animationController(forPresented presented: UIViewController, presenting: UIViewController, source: UIViewController) -> UIViewControllerAnimatedTransitioning? {
        
-        // Init code before presenting view.
+        /// Init code before presenting view.
         menuBar.hideMenuBar(true, animated: true)
         transition.transitionMode = .present
         

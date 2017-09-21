@@ -89,7 +89,6 @@ class PriorityCircleOverallView: UIView {
     private var objectivesCircleView:CircleView!
     private var targetsCircleView:CircleView!
     private var title:String!
-    private var estimatedTime:TimeMeasurment!
     private var _state:PriorityCircleOverallState = .normal
     var state:PriorityCircleOverallState {
         set {
@@ -100,6 +99,9 @@ class PriorityCircleOverallView: UIView {
         }
     }
     var delegate:PriorityCircleOverallDelegate?
+    private let colors = [#colorLiteral(red: 0, green: 0, blue: 0, alpha: 1), #colorLiteral(red: 0.09839882702, green: 0.4573818445, blue: 0.5702347159, alpha: 1), #colorLiteral(red: 0.5802578926, green: 0.8064834476, blue: 0.9194456935, alpha: 1)]
+    
+    
     
     enum PriorityCircleOverallState {
         case details
@@ -118,13 +120,13 @@ class PriorityCircleOverallView: UIView {
     
     func setProgress(value:Double, for structure: TaskSplitterStructure) {
         switch structure {
-        case .aims:
+        case .urgents:
             aimsCircleView.progress = value
             break
-        case .objectives:
+        case .moderates:
             objectivesCircleView.progress = value
             break
-        case .targets:
+        case .optionals:
             targetsCircleView.progress = value
             break
         default:
@@ -135,15 +137,15 @@ class PriorityCircleOverallView: UIView {
     public func setUp(for splitter:TaskSplitter) {
         self.backgroundColor = .clear
         self.layoutIfNeeded()
-        aimsCircleView = CircleView(frame: .zero, color: splitter.priorityCircleColors[0], progress: 0, of: .aim)
+        aimsCircleView = CircleView(frame: .zero, color: colors[2], progress: 0, of: .optional)
         aimsCircleView.translatesAutoresizingMaskIntoConstraints = false
         self.addSubview(aimsCircleView)
         
-        objectivesCircleView = CircleView(frame: .zero, color: splitter.priorityCircleColors[1], progress: 0, of: .objective)
+        objectivesCircleView = CircleView(frame: .zero, color: colors[1], progress: 0, of: .moderate)
         objectivesCircleView.translatesAutoresizingMaskIntoConstraints = false
         aimsCircleView.addSubview(objectivesCircleView)
         
-        targetsCircleView = CircleView(frame: .zero, color: splitter.priorityCircleColors[2], progress: 0, of: .target)
+        targetsCircleView = CircleView(frame: .zero, color: colors[0], progress: 0, of: .urgent)
         targetsCircleView.translatesAutoresizingMaskIntoConstraints = false
         objectivesCircleView.addSubview(targetsCircleView)
         

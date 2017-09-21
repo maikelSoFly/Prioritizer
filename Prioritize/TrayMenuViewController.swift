@@ -20,6 +20,7 @@ import UIKit
 @objc enum TrayMenuState: Int {
     case opened = 1
     case closed = 0
+    case expanded = 2
 }
 
 enum TrayMenuStyle {
@@ -77,8 +78,9 @@ class TrayMenuViewController: UIViewController {
     private var trayClosed:CGFloat!
     private var trayOpened:CGFloat!
     private var trayHidden:CGFloat!
+    private var trayFullyExpanded:CGFloat = -5.0
     private var cornerRadius:CGFloat = 10
-    @objc weak var constraint:NSLayoutConstraint!
+    weak var constraint:NSLayoutConstraint!
     weak var delegate:TrayMenuDelegate! // Remember to always make it WEAK reference
     private var trayOriginalCenter:CGFloat!
     private var possibleDirectionState:IndicatorDirection = .downwards {
@@ -88,23 +90,29 @@ class TrayMenuViewController: UIViewController {
     }
     public var state:TrayMenuState = .closed {
         didSet {
-            
+        
             delegate.stateChanged?(state: state)
             
-            if state == .opened {
+            if state == .opened || state == .expanded {
+                label.text = "CLOSE"
                 possibleDirectionState = style == .top ? .upwards : .downwards
             } else {
+                label.text = "MENU"
                 possibleDirectionState = style == .top ? .downwards : .upwards
             }
         }
     }
     private var style:TrayMenuStyle = .top
     fileprivate var menuControls = [TrayMenuButton]()
-    fileprivate var containerInsets = UIEdgeInsets(top: 40, left: 30, bottom: 10, right: 30)
+    fileprivate var containerInsets = UIEdgeInsets(top: 40, left: 30, bottom: 5, right: 30)
     fileprivate var itemsPerRow:CGFloat = 4
     public weak var dimView:DimView!
     private var vibrancyView:UIVisualEffectView!
-    
+    public var tintStyle: TrayMenuTintStyle = .normal  {
+        didSet {
+            container.reloadData()
+        }
+    }
     
     
     enum IndicatorDirection {
@@ -138,6 +146,7 @@ class TrayMenuViewController: UIViewController {
         vibrancyView.contentView.addSubview(container)
         
         blurView.contentView.addSubview(vibrancyView)
+        view.addGestureRecognizer(UIPanGestureRecognizer(target: self, action: #selector(self.respondToPan(sender:))))
     }
     
     deinit {
@@ -150,7 +159,6 @@ class TrayMenuViewController: UIViewController {
     }
     
     func setUpView(trayOpenedHeight:CGFloat, trayClosedHeight:CGFloat, constraint:NSLayoutConstraint!, style:TrayMenuStyle) {
-    
         self.trayOpenedMargin = view.frame.height - trayOpenedHeight
         self.trayClosedHeight = trayClosedHeight
         self.constraint = constraint
@@ -174,7 +182,7 @@ class TrayMenuViewController: UIViewController {
             layoutControlls()
         }
         
-        view.addGestureRecognizer(UIPanGestureRecognizer(target: self, action: #selector(self.respondToPan(sender:))))
+        
     }
     
     func setUpContainer(insets:UIEdgeInsets, itemsPerRow:CGFloat) {
@@ -242,6 +250,7 @@ class TrayMenuViewController: UIViewController {
             break
         case .changed:
             move(with: translation)
+            trayOriginalCenter = constraint.constant
             break
         case .ended:
             stickToBound(with: velocity)
@@ -249,9 +258,24 @@ class TrayMenuViewController: UIViewController {
         default:
             break
         }
+        sender.setTranslation(.zero, in: view)
     }
     
     func use() {
+        if state == .expanded {
+            constraint.constant = trayOpened
+            
+            UIView.animate(withDuration: 0.3, delay: 0, options: .curveEaseInOut, animations: {
+                self.delegate.updateLayout()
+                self.container.alpha = 1.0
+            }, completion: { (success) in
+                self.state = .opened
+            })
+            
+            return
+        }
+        
+        
         if state == .closed {
             //  OPEN
     
@@ -284,24 +308,49 @@ class TrayMenuViewController: UIViewController {
     
     func move(with translation:CGPoint) {
         if style == .top {
-            let y = (-view.frame.height + trayClosedHeight ... -(cornerRadius / 2)).clamp(trayOriginalCenter + translation.y)
-            self.constraint.constant = y
+            self.constraint.constant = (-view.frame.height + trayClosedHeight ... -(cornerRadius * 0.5)).clamp(trayOriginalCenter + translation.y)
         } else {
-            let y = (trayClosed ... -(cornerRadius / 2)).clamp(trayOriginalCenter - translation.y)
-            self.constraint.constant = y
-        }
-
-        // Fading dim view if exists
-        if dimView != nil {
-            dimView.alpha = (0 ... 0.35).clamp((self.constraint.constant - trayClosed).remap(from1: 0, to1: trayOpened - trayClosed, from2: 0, to2: 0.35))
+            self.constraint.constant = (trayClosed ... -(cornerRadius * 0.5)).clamp(trayOriginalCenter - translation.y)
         }
         
-        // Fading the container
-        container.alpha = (0 ... 1.0).clamp((self.constraint.constant - trayClosed).remap(from1: 0, to1: trayOpened - trayClosed, from2: 0, to2: 1.0))
+        
+        
+//        if constraint.constant <= trayOpened {
+//            state = .opened
+//        } else {
+//            state = .expanded
+//        }
+//
+//        // Fading dim view if exists
+//        if dimView != nil {
+//            dimView.alpha = (0 ... 0.35).clamp((self.constraint.constant - trayClosed).remap(from1: 0, to1: trayOpened - trayClosed, from2: 0, to2: 0.35))
+//        }
+//        
+//        // Fading the container
+//        if state != .expanded {
+//            container.alpha = (0 ... 1.0).clamp((self.constraint.constant - trayClosed).remap(from1: 0, to1: trayOpened - trayClosed, from2: 0, to2: 1.0))
+//        }
     }
     
     
     func stickToBound(with velocity:CGPoint)  {
+        
+        
+        if state == .expanded {
+            let time = (0.1 ... 0.3).clamp(abs((trayOpened - self.constraint.constant) / velocity.y))
+            
+            constraint.constant = trayOpened
+            
+            UIView.animate(withDuration: TimeInterval(time), delay: 0, options: .curveEaseInOut, animations: {
+                self.delegate.updateLayout()
+                self.container.alpha = 1.0
+            }, completion: { (success) in
+                self.state = .opened
+            })
+            return
+        }
+        
+        
         let multiplier:CGFloat = style == .top ? 1 : -1
         if multiplier * velocity.y > 0 {
             let time = (0.3 ... 0.6).clamp(abs((self.constraint.constant - trayOpened) / velocity.y))
@@ -318,7 +367,6 @@ class TrayMenuViewController: UIViewController {
                 self.state = .opened
             })
         } else {
-            
             let time = (0.3 ... 0.6).clamp(abs((self.constraint.constant - trayClosed) / velocity.y))
             
             self.constraint.constant = trayClosed
@@ -415,6 +463,18 @@ class TrayMenuViewController: UIViewController {
             break
         }
     }
+    
+    func expand() {
+        constraint.constant = trayFullyExpanded
+        
+        UIView.animate(withDuration: 0.3, delay: 0, options: .curveEaseInOut, animations: { 
+            self.delegate.updateLayout()
+            self.container.alpha = 0.0
+        }, completion: { (success) in
+            self.state = .expanded
+        })
+    }
+    
 }
 
 
@@ -434,7 +494,7 @@ extension TrayMenuViewController:UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "menuCell", for: indexPath) as! TrayMenuCollectionViewCell
         
-        cell.configure(object: menuControls[indexPath.row]) // TODO
+        cell.configure(object: menuControls[indexPath.row], tintStyle: tintStyle) // TODO
         
         return cell
     }
@@ -451,14 +511,15 @@ extension TrayMenuViewController:UICollectionViewDelegateFlowLayout {
         let itemWidth = (availableWidth / itemsPerRow) - 10
         let itemHeight = (availableHeight / (CGFloat(menuControls.count) / itemsPerRow)) - 10
         
-        let itemSize = itemWidth < itemHeight ? itemWidth : itemHeight
-        
-        
-        return CGSize(width: itemSize, height: itemSize)
+        return CGSize(width: itemWidth, height: itemHeight)
     }
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, insetForSectionAt section: Int) -> UIEdgeInsets {
         
         return containerInsets
+    }
+    
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, minimumLineSpacingForSectionAt section: Int) -> CGFloat {
+        return 5
     }
 }

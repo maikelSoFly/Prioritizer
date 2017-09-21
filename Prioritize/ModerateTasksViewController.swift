@@ -12,6 +12,7 @@ class ModerateTasksViewController: UIViewController {
     @IBAction func handleDismissButton(_ sender: UIButton) {
         self.dismiss(animated: true, completion: nil)
     }
+    @IBOutlet weak var label: UILabel!
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -22,21 +23,22 @@ class ModerateTasksViewController: UIViewController {
     deinit {
         print("💾 ModerateTasksViewController deinitialized...")
     }
+    
+    
+    // ⚡️ FUNCTIONS
+    
+    
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
     
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destinationViewController.
-        // Pass the selected object to the new view controller.
+    public func makeViewsVisibleAgainstBackground(color:UIColor) {
+        label.textColor = color.contrastColor()
     }
-    */
+    
+
+  
 
 }

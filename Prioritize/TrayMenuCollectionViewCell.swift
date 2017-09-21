@@ -11,6 +11,7 @@ import UIKit
 class TrayMenuCollectionViewCell: UICollectionViewCell {
     private weak var control:TrayMenuButton!
     private var labelHeight:CGFloat = 14
+    private var tintStyle:TrayMenuTintStyle!
     
     private var label:UILabel = {
         let view = UILabel()
@@ -21,12 +22,14 @@ class TrayMenuCollectionViewCell: UICollectionViewCell {
         return view
     }()
     
-    func configure(object:TrayMenuButton) {
+    func configure(object:TrayMenuButton, tintStyle:TrayMenuTintStyle) {
+        self.tintStyle = tintStyle
         self.control = object
         self.label.text = object.buttonDescription
         self.layer.masksToBounds = true
         layoutViews()
     }
+    
     
     override func awakeFromNib() {
         
@@ -43,8 +46,8 @@ class TrayMenuCollectionViewCell: UICollectionViewCell {
         self.addSubview(label)
     
         
-        control.widthAnchor.constraint(equalToConstant: self.frame.width - labelHeight).isActive = true
-        control.heightAnchor.constraint(equalToConstant: self.frame.height - labelHeight).isActive = true
+        control.widthAnchor.constraint(equalToConstant: self.frame.height - (labelHeight+3)).isActive = true
+        control.heightAnchor.constraint(equalToConstant: self.frame.height - (labelHeight+3)).isActive = true
         let constraint = NSLayoutConstraint(item: control, attribute: .centerX, relatedBy: .equal, toItem: self, attribute: .centerX, multiplier: 1, constant: 0)
         constraint.isActive = true
         control.topAnchor.constraint(equalTo: self.topAnchor).isActive = true
@@ -54,12 +57,11 @@ class TrayMenuCollectionViewCell: UICollectionViewCell {
         label.trailingAnchor.constraint(equalTo: self.trailingAnchor).isActive = true
         label.bottomAnchor.constraint(equalTo: self.bottomAnchor).isActive = true
         
+        
+        control.tintStyle = tintStyle
         control.layoutIfNeeded()
-        control.layer.masksToBounds = true
-        control.layer.cornerRadius = control.frame.size.width / 2
-        control.backgroundColor = .white
-        control.imageView?.contentMode = .scaleAspectFit
-        control.imageEdgeInsets = UIEdgeInsets(top: 12, left: 12, bottom: 12, right: 12)
-        control.tintColor = UIColor.black.withAlphaComponent(0.45)
+        control.layer.cornerRadius = control.frame.height / 2
+        let inset = control.frame.height * 0.25
+        control.imageEdgeInsets = UIEdgeInsets(top: inset, left: inset, bottom: inset, right: inset)
     }
 }
