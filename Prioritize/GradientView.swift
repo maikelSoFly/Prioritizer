@@ -35,7 +35,7 @@ import UIKit
         
         gradientLayer.colors = colors
         gradientLayer.locations = locations as [NSNumber]
-        gradientLayer.frame = self.bounds
+        gradientLayer.bounds = self.bounds
     }
 }
 

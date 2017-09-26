@@ -19,7 +19,7 @@ class DimView: UIView {
         }
     }
 
-    init(in view: UIView, forTrayView tray:UIView, withStyle style:TrayMenuStyle) {
+    init(in view: UIView, forTrayView tray:UIView, withStyle style:TrayMenuPlacement) {
         let extendedFrame:CGRect
         
         if style == .top {
@@ -58,7 +58,7 @@ class DimView: UIView {
         view.layer.mask = mask
     }
     
-    private func setUpConstraints(in view:UIView, forTrayView tray:UIView, withStyle style:TrayMenuStyle) {
+    private func setUpConstraints(in view:UIView, forTrayView tray:UIView, withStyle style:TrayMenuPlacement) {
         if style == .top {
             let dimConstraints:[NSLayoutConstraint] = [
                 self.topAnchor.constraint(equalTo: tray.topAnchor),

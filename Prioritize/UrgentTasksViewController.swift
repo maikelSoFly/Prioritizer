@@ -14,6 +14,7 @@ class UrgentTasksViewController: UIViewController {
     }
     @IBOutlet weak var trayMenuView: UIView!
     
+    @IBOutlet weak var dismissButton: UIButton!
     @IBOutlet weak var label: UILabel!
     weak var trayMenuViewController:TrayMenuViewController!
     private var dimView:DimView!
@@ -23,6 +24,11 @@ class UrgentTasksViewController: UIViewController {
         super.viewDidLoad()
         view.layer.masksToBounds = true
         
+        /// Dismiss Button
+        dismissButton.setImage(#imageLiteral(resourceName: "close").withRenderingMode(.alwaysTemplate), for: .normal)
+        dismissButton.tintColor = .white
+        label.textColor = .white
+        
         
         // Dim View
         
@@ -31,12 +37,12 @@ class UrgentTasksViewController: UIViewController {
         dimView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(respondToDimViewTap(sender:))))
         
         
-        trayMenuViewController.setUpView(trayOpenedHeight: 200, superview: trayMenuView, trayClosedHeight: 80, style: .bottom)
+        trayMenuViewController.setUpView(trayOpenedHeight: 200, superview: trayMenuView, trayClosedHeight: 80, placement: .bottom, style: .discreet)
         
-        let btn5 = TrayMenuButton(image: #imageLiteral(resourceName: "image"), description: "Images")
-        let btn6 = TrayMenuButton(image: #imageLiteral(resourceName: "lens"), description: "Camera")
-        let btn7 = TrayMenuButton(image: #imageLiteral(resourceName: "bitcoin"), description: "Wallet")
-        let btn8 = TrayMenuButton(image: #imageLiteral(resourceName: "profile"), description: "Profile")
+        let btn5 = TrayMenuButton(image: #imageLiteral(resourceName: "check"), description: "Check")
+        let btn6 = TrayMenuButton(image: #imageLiteral(resourceName: "addReminder"), description: "Add Reminder")
+        let btn7 = TrayMenuButton(image: #imageLiteral(resourceName: "removeFolder"), description: "Remove All")
+        let btn8 = TrayMenuButton(image: #imageLiteral(resourceName: "sort"), description: "Sort")
         
         trayMenuViewController.setUpContainer(insets: UIEdgeInsets(top: 20, left: 30, bottom: 25, right: 30), itemsPerRow: 4)
         trayMenuViewController.addControls(controls: [btn5, btn6, btn7, btn8])
@@ -48,6 +54,8 @@ class UrgentTasksViewController: UIViewController {
         print("💾 UrgentTasksViewController deinitialized...")
     }
     
+
+    
     
     
     // ⚡️ FUNCTIONS
@@ -58,12 +66,6 @@ class UrgentTasksViewController: UIViewController {
         trayMenuViewController.use()
     }
     
-    public func  makeViewsVisibleAgainstBackground(color:UIColor) {
-        let contrastColor = color.contrastColor()
-        label.textColor = contrastColor
-        trayMenuViewController.tintStyle = contrastColor == .white ? .light : .normal
-        
-    }
 
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()

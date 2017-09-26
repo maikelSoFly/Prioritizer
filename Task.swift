@@ -11,6 +11,7 @@ import UIKit
 class Task: NSObject {
     public var title:String
     public var additionalDescription:String
+    public var color:UIColor
     private(set) var priority:TaskPriority
     private(set) var maxRealizationTime:Measurement<UnitDuration> // Provided by user
     public var maxRealizationTimeInSeconds:Measurement<UnitDuration> {
@@ -100,12 +101,13 @@ class Task: NSObject {
     
     
     
-    init(title:String, description:String, priority:TaskPriority, deadline:Date, maxRealizationTime:Measurement<UnitDuration>) {
+    init(title:String, description:String, priority:TaskPriority, deadline:Date, maxRealizationTime:Measurement<UnitDuration>, color:UIColor) {
         self.title = title
         self.additionalDescription = description
         self.priority = priority
         self.deadline = deadline
         self.maxRealizationTime = maxRealizationTime
+        self.color = color
         self.timestamp = Date(timeIntervalSinceNow: 0)
     }
 }

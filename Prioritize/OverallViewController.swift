@@ -17,22 +17,30 @@ class OverallViewController: UIViewController {
     fileprivate var transition:CircularTransition = CircularTransition()
     fileprivate let transitionDuration:TimeInterval = 0.2
     fileprivate var gradientLayer:CAGradientLayer!
-    @IBOutlet weak var testButton: UIButton!
     
-    @IBAction func handleTestButton(_ sender: UIButton) {
+    @objc private func handleShowProgress(value:Double) {
         if priorityCircleOverallView.state == .normal {
-            let a = Int.randomInt(min: 0, max: 100)
-            let b = Int.randomInt(min: 0, max: 100)
-            let c = Int.randomInt(min: 0, max: 100)
+//            let a = Int.randomInt(min: 0, max: 100)
+//            let b = Int.randomInt(min: 0, max: 100)
+//            let c = Int.randomInt(min: 0, max: 100)
             
-            priorityCircleOverallView.setProgress(value: Double(a), for: .urgents)
-            priorityCircleOverallView.setProgress(value: Double(b), for: .moderates)
-            priorityCircleOverallView.setProgress(value: Double(c), for: .optionals)
+            
+            priorityCircleOverallView.setProgress(value: value, for: .urgents)
+            priorityCircleOverallView.setProgress(value: value, for: .moderates)
+            priorityCircleOverallView.setProgress(value: value, for: .optionals)
         }
     }
     fileprivate var dimView:DimView!
     private var timer:Timer!
     private var timerInterval:TimeInterval = 60  // "It's 5 min!" ~Captain Obvious
+    private var isStatusBarHidden:Bool = false {
+        didSet{
+            UIView.animate(withDuration: 0.5) { () -> Void in
+                self.setNeedsStatusBarAppearanceUpdate()
+            }
+        }
+    }
+    private var rocketsStartPositions = [CGPoint]()
     
     
     
@@ -45,16 +53,18 @@ class OverallViewController: UIViewController {
         view.layer.masksToBounds = true
         view.layer.cornerRadius = 5
         
-        /// Test button
-        testButton.backgroundColor = UIColor.white.withAlphaComponent(0.5)
-        testButton.layer.cornerRadius = 8
-        testButton.layer.masksToBounds = true
-        testButton.tintColor = #colorLiteral(red: 1, green: 0.4082366228, blue: 0.3242999315, alpha: 1)
-        testButton.titleLabel?.font = UIFont(name: "Helvetica-Bold", size: 12)
-        
         
         /// Initializing Task Splitter.
         view.bringSubview(toFront: priorityCircleOverallView)
+        
+        priorityCircleOverallView.translatesAutoresizingMaskIntoConstraints = false
+        priorityCircleOverallView.centerYAnchor.constraint(equalTo: view.bottomAnchor).isActive = true
+        priorityCircleOverallView.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+        /// 2/3 * PCOV.frame.width = ScreenWidth  ==>  PCOV.frame.width = 3/2 ScreenWidth
+        priorityCircleOverallView.widthAnchor.constraint(equalToConstant: (3/2) * UIScreen.main.bounds.width).isActive = true
+        priorityCircleOverallView.heightAnchor.constraint(equalToConstant: (3/2) * UIScreen.main.bounds.width).isActive = true
+        view.layoutIfNeeded()
+        
         priorityCircleOverallView.isUserInteractionEnabled = true
         priorityCircleOverallView.delegate = self
         taskSplitter = TaskSplitter(title: "Main Task Splitter", priorityCircleColors: UIColor.defaultAppColors())
@@ -72,12 +82,12 @@ class OverallViewController: UIViewController {
         menuBar.dimView = dimView
         dimView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(respondToDimViewTap(sender:))))
 
-        menuBar.setUpView(trayOpenedHeight: 250, superview: menuBarView, trayClosedHeight: 100, style: .top)
+        menuBar.setUpView(trayOpenedHeight: 250, superview: menuBarView, trayClosedHeight: 100, placement: .top, style: .normal)
 
         let btn1 = TrayMenuButton(image: #imageLiteral(resourceName: "add"), description: "Add Task")
         let btn2 = TrayMenuButton(image: #imageLiteral(resourceName: "flame"), description: "Hot")
-        let btn3 = TrayMenuButton(image: #imageLiteral(resourceName: "shuffle"), description: "Shuffle")
-        let btn4 = TrayMenuButton(image: #imageLiteral(resourceName: "burger"), description: "Meal")
+        let btn3 = TrayMenuButton(image: #imageLiteral(resourceName: "progress"), description: "Show Progress")
+        let btn4 = TrayMenuButton(image: #imageLiteral(resourceName: "sort"), description: "Sort")
         let btn5 = TrayMenuButton(image: #imageLiteral(resourceName: "image"), description: "Images")
         let btn6 = TrayMenuButton(image: #imageLiteral(resourceName: "lens"), description: "Camera")
         let btn7 = TrayMenuButton(image: #imageLiteral(resourceName: "bitcoin"), description: "Wallet")
@@ -89,6 +99,7 @@ class OverallViewController: UIViewController {
         /// Button targets
         
         btn1.addTarget(self, action: #selector(addTask(sender:)), for: .touchUpInside)
+        //btn3.addTarget(self, action: #selector(handleShowProgressButton), for: .touchUpInside)
         // ...
 
 //🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰
@@ -96,14 +107,36 @@ class OverallViewController: UIViewController {
 
         /// Scheduled Timer
         timer = Timer.scheduledTimer(timeInterval: timerInterval, target: self, selector: #selector(self.updateTimer(timer:)), userInfo: nil, repeats: true)
+    
+        
+        /// Paths View
+        
+        rocketsStartPositions = priorityCircleOverallView.setRocketsStartPositions(relativeToView: view)
+        
+        let pathsView = PathsView()
+        pathsView.backgroundColor = .clear
+        pathsView.frame = view.frame
+        let centerRocketPos = priorityCircleOverallView.centerRocketPositionRelative(to: self.view)
+        let rocketStart = CGPoint(x: centerRocketPos.x, y: 100.0)
+        
+        
+        for point in rocketsStartPositions {
+            pathsView.addCustomPath(moveTo: rocketStart, endAt: point)
+        }
+        
+        view.addSubview(pathsView)
+        
     }
 
+    
+    
+    
     deinit {
         print("💾 OverallViewController deinitialized...")
     }
     
     @objc func test(sender:UITapGestureRecognizer) {
-        print("kurwaaa")
+       
     }
     
     @objc func updateTimer(timer:Timer) {
@@ -119,9 +152,31 @@ class OverallViewController: UIViewController {
     }
     
     @objc func addTask(sender:TrayMenuButton) {
-        menuBar.expand()
+        
+        let testView = UIView(frame: .zero)
+        
+        testView.backgroundColor = UIColor.white.withAlphaComponent(0.1)
+        let label = UILabel()
+        label.text = "Coming soon..."
+        label.font = UIFont(name: "Helvetica-Bold", size: 14)
+        testView.addSubview(label)
+        label.textColor = .white
+        label.translatesAutoresizingMaskIntoConstraints = false
+        
+        label.centerXAnchor.constraint(equalTo: testView.centerXAnchor).isActive = true
+        label.centerYAnchor.constraint(equalTo: testView.centerYAnchor).isActive = true
+        
+        
+        menuBar.expand(withView: testView)
     }
     
+    override var preferredStatusBarUpdateAnimation: UIStatusBarAnimation{
+        return .slide
+    }
+    
+    override var prefersStatusBarHidden: Bool{
+        return isStatusBarHidden
+    }
     
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
@@ -141,6 +196,15 @@ class OverallViewController: UIViewController {
         vc.modalPresentationStyle = .custom
     }
     
+    override func viewDidAppear(_ animated: Bool) {
+        handleShowProgress(value: 50.0)
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+       handleShowProgress(value: 0.0)
+    }
+    
+    
     
 }
 
@@ -153,7 +217,9 @@ class OverallViewController: UIViewController {
 extension OverallViewController:PriorityCircleOverallDelegate {
     func tapped(on circle: CircleView) {
         let type = circle.taskType
-        transition.setUp(circle: circle, duration: 0.1)
+        
+        transition.setUp(circle: circle, duration: 0.1, centerPoint: priorityCircleOverallView.center)
+        
         
         switch type {
         case .urgent:
@@ -177,6 +243,7 @@ extension OverallViewController:PriorityCircleOverallDelegate {
             menuBar.hideMenuBar(false, animated: true)
         }
     }
+    
 
 }
 
@@ -203,6 +270,14 @@ extension OverallViewController:UIViewControllerTransitioningDelegate {
 extension OverallViewController:TrayMenuDelegate {
     func updateLayout() {
         view.layoutIfNeeded()
+    }
+    
+    func stateChanged(state: TrayMenuState) {
+        if state == .closed || state == .closing || state == .showing {
+            isStatusBarHidden = false
+        } else {
+            isStatusBarHidden = true
+        }
     }
 }
 

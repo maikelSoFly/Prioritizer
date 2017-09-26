@@ -14,8 +14,15 @@ class ModerateTasksViewController: UIViewController {
     }
     @IBOutlet weak var label: UILabel!
 
+    @IBOutlet weak var dismissButton: UIButton!
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        /// Dismiss button
+        dismissButton.setImage(#imageLiteral(resourceName: "close").withRenderingMode(.alwaysTemplate), for: .normal)
+        dismissButton.tintColor = .white
+        label.textColor = .white
+        
 
         // Do any additional setup after loading the view.
     }
@@ -33,10 +40,7 @@ class ModerateTasksViewController: UIViewController {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
-    
-    public func makeViewsVisibleAgainstBackground(color:UIColor) {
-        label.textColor = color.contrastColor()
-    }
+   
     
 
   

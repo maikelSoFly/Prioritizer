@@ -23,9 +23,9 @@ class TrayMenuButton:UIButton {
             _tintStyle = newValue
             if newValue == .normal {
                 tintColor = UIColor.black.withAlphaComponent(0.5)
+                backgroundColor = UIColor.white.withAlphaComponent(0.5)
             } else {
-                backgroundColor = UIColor.white.withAlphaComponent(0.65)
-                tintColor = UIColor.black.withAlphaComponent(0.2)
+                backgroundColor = UIColor.white.withAlphaComponent(0.3)
             }
         }
     }
@@ -48,11 +48,11 @@ class TrayMenuButton:UIButton {
         didSet {
             if isHighlighted {
                 UIView.animate(withDuration: 0.2, delay: 0, options: .curveEaseInOut, animations: {
-                    self.backgroundColor = UIColor.white.withAlphaComponent(0.4)
+                    self.backgroundColor = UIColor.white.withAlphaComponent(0.2)
                 }, completion: nil)
             } else {
                 UIView.animate(withDuration: 0.2, delay: 0, options: .curveEaseInOut, animations: {
-                    self.backgroundColor = self.tintStyle == .normal ? .white : UIColor.white.withAlphaComponent(0.65)
+                    self.backgroundColor = UIColor.white.withAlphaComponent( (self.tintStyle == .normal ? 0.5 : 0.3) )
                 }, completion: nil)
             }
         }

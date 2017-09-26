@@ -13,6 +13,7 @@ class OptionalTasksViewController: UIViewController {
         self.dismiss(animated: true, completion: nil)
     }
     @IBOutlet weak var label: UILabel!
+    @IBOutlet weak var dismissButton: UIButton!
     
     private lazy var collectionView:UICollectionView = {
         var flowLayout = UICollectionViewFlowLayout()
@@ -29,6 +30,11 @@ class OptionalTasksViewController: UIViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        
+        /// Dismiss button
+        dismissButton.setImage(#imageLiteral(resourceName: "close").withRenderingMode(.alwaysTemplate), for: .normal)
+        dismissButton.tintColor = .black
+        label.textColor = .black
 
         layoutViews()
     }
@@ -52,11 +58,6 @@ class OptionalTasksViewController: UIViewController {
     private func layoutViews() {
         
     }
-    
-    public func  makeViewsVisibleAgainstBackground(color:UIColor) {
-        label.textColor = color.contrastColor()
-    }
-
 }
 
 

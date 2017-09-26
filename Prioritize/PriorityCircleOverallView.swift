@@ -41,12 +41,18 @@ class CircleView:UIView {
         return pow(center.x-point.x, 2) + pow(center.y - point.y, 2) <= pow(bounds.size.width/2, 2)
     }
     
-    lazy var progressCircleView:UIView = {
-        let view = UIView(frame: .zero)
+    lazy var progressCircleView:RadialGradientView = {
+        let inColor = UIColor.makeLighterColor(of: self.color, by: -0.3).withAlphaComponent((self.taskType == .urgent || self.taskType == .optional ? 0.2 : 1.0))
+        let outColor = UIColor.makeLighterColor(of: self.color, by: 0.2).withAlphaComponent( (self.taskType == .urgent || self.taskType == .optional ? 0.25 : 0.8) )
+        
+        let view = RadialGradientView(frame: .zero, insideColor: inColor, outsideColor: outColor)
         view.center = CGPoint(x: self.frame.size.width/2, y: self.frame.size.height/2)
+        view.layer.masksToBounds = true
         self.addSubview(view)
-        view.backgroundColor = self.color.withAlphaComponent(0.5)
+        view.backgroundColor = .clear
         view.layer.cornerRadius = view.frame.width/2
+        view.layer.borderColor = self.taskType == .urgent ? UIColor.darkGray.withAlphaComponent(0.5).cgColor : UIColor.lightGray.withAlphaComponent(0.5).cgColor
+        view.layer.borderWidth = 0.0
         self.sendSubview(toBack: view)
         return view
     }()
@@ -56,12 +62,30 @@ class CircleView:UIView {
         self.progress = progress
         self.taskType = type
         super.init(frame: frame)
-        self.backgroundColor = UIColor.makeLighterColor(of: color, by: 0.2)
+        self.backgroundColor = color
+        
+        dropShadow()
     }
+    
+    func dropShadow() {
+        if taskType == .optional {
+            layer.shadowColor = UIColor.black.cgColor
+            layer.shadowOpacity = 0.35
+            layer.shadowOffset = CGSize.zero
+            layer.shadowRadius = 10
+            layer.shouldRasterize = true
+            layer.rasterizationScale = UIScreen.main.scale
+        } else {
+            /// Shadow for urgent & moderate tiers.
+        }
+    }
+    
     
     required init?(coder aDecoder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    
+    
     
     private func animateProgressIn(from frame:CGRect?) {
         
@@ -74,7 +98,7 @@ class CircleView:UIView {
             progressCircleView.transform = CGAffineTransform(scaleX: 0.001, y: 0.001)
         }
         
-        UIView.animate(withDuration: 1, delay: 0, options: .curveEaseInOut, animations: {
+        UIView.animate(withDuration: 0.5, delay: 0, options: .curveEaseInOut, animations: {
             self.progressCircleView.transform = CGAffineTransform.identity
         }, completion: nil)
     }
@@ -90,6 +114,7 @@ class PriorityCircleOverallView: UIView {
     private var targetsCircleView:CircleView!
     private var title:String!
     private var _state:PriorityCircleOverallState = .normal
+    var protrudingWidth:Double = 0
     var state:PriorityCircleOverallState {
         set {
              _state = newValue
@@ -99,7 +124,8 @@ class PriorityCircleOverallView: UIView {
         }
     }
     var delegate:PriorityCircleOverallDelegate?
-    private let colors = [#colorLiteral(red: 0, green: 0, blue: 0, alpha: 1), #colorLiteral(red: 0.09839882702, green: 0.4573818445, blue: 0.5702347159, alpha: 1), #colorLiteral(red: 0.5802578926, green: 0.8064834476, blue: 0.9194456935, alpha: 1)]
+    /// Colors of tiers; [urgent, moderate, optional]
+    private let colors = [#colorLiteral(red: 0.142003311, green: 0.1434092844, blue: 0.1434092844, alpha: 1), #colorLiteral(red: 0.7456802726, green: 0.06953835487, blue: 0.2190275192, alpha: 1), #colorLiteral(red: 0.921431005, green: 0.9214526415, blue: 0.9214410186, alpha: 1).withAlphaComponent(0.6)]
     
     
     
@@ -136,7 +162,7 @@ class PriorityCircleOverallView: UIView {
     
     public func setUp(for splitter:TaskSplitter) {
         self.backgroundColor = .clear
-        self.layoutIfNeeded()
+       
         aimsCircleView = CircleView(frame: .zero, color: colors[2], progress: 0, of: .optional)
         aimsCircleView.translatesAutoresizingMaskIntoConstraints = false
         self.addSubview(aimsCircleView)
@@ -149,34 +175,31 @@ class PriorityCircleOverallView: UIView {
         targetsCircleView.translatesAutoresizingMaskIntoConstraints = false
         objectivesCircleView.addSubview(targetsCircleView)
         
+      
         
-        let ACVConstraints:[NSLayoutConstraint] = [
-            aimsCircleView.widthAnchor.constraint(equalToConstant: self.frame.width),
-            aimsCircleView.heightAnchor.constraint(equalToConstant: self.frame.width),
-            NSLayoutConstraint(item: self.aimsCircleView, attribute: .centerX, relatedBy: .equal, toItem: self, attribute: .centerX, multiplier: 1, constant: 0),
-            NSLayoutConstraint(item: self.aimsCircleView, attribute: .centerY, relatedBy: .equal, toItem: self, attribute: .centerY, multiplier: 1, constant: 0)
+        let const:CGFloat = self.frame.width / 3
+        protrudingWidth = Double(const/2)
+        print(const)
+        let circlesConstraints:[NSLayoutConstraint] = [
+            aimsCircleView.widthAnchor.constraint(equalTo: self.widthAnchor),
+            aimsCircleView.heightAnchor.constraint(equalTo: self.heightAnchor),
+            aimsCircleView.centerXAnchor.constraint(equalTo: self.centerXAnchor),
+            aimsCircleView.centerYAnchor.constraint(equalTo: self.centerYAnchor),
+            
+            objectivesCircleView.widthAnchor.constraint(equalTo: self.widthAnchor, constant: -const),
+            objectivesCircleView.heightAnchor.constraint(equalTo: self.heightAnchor, constant: -const),
+            objectivesCircleView.centerXAnchor.constraint(equalTo: self.centerXAnchor),
+            objectivesCircleView.centerYAnchor.constraint(equalTo: self.centerYAnchor),
+            
+            targetsCircleView.widthAnchor.constraint(equalTo: objectivesCircleView.widthAnchor, constant: -const),
+            targetsCircleView.heightAnchor.constraint(equalTo: objectivesCircleView.heightAnchor, constant: -const),
+            targetsCircleView.centerXAnchor.constraint(equalTo: self.centerXAnchor),
+            targetsCircleView.centerYAnchor.constraint(equalTo: self.centerYAnchor)
         ]
     
-        NSLayoutConstraint.activate(ACVConstraints)
+        NSLayoutConstraint.activate(circlesConstraints)
         
-        let const:CGFloat = self.frame.width/6
-        let OCVConstraints:[NSLayoutConstraint] = [
-            objectivesCircleView.topAnchor.constraint(equalTo: aimsCircleView.topAnchor, constant: const),
-            objectivesCircleView.leadingAnchor.constraint(equalTo: aimsCircleView.leadingAnchor, constant: const),
-            objectivesCircleView.trailingAnchor.constraint(equalTo: aimsCircleView.trailingAnchor, constant: -const),
-            objectivesCircleView.bottomAnchor.constraint(equalTo: aimsCircleView.bottomAnchor, constant: -const)
-        ]
         
-        NSLayoutConstraint.activate(OCVConstraints)
-        
-        let TCVConstraints:[NSLayoutConstraint] = [
-            targetsCircleView.topAnchor.constraint(equalTo: objectivesCircleView.topAnchor, constant: const),
-            targetsCircleView.leadingAnchor.constraint(equalTo: objectivesCircleView.leadingAnchor, constant: const),
-            targetsCircleView.trailingAnchor.constraint(equalTo: objectivesCircleView.trailingAnchor, constant: -const),
-            targetsCircleView.bottomAnchor.constraint(equalTo: objectivesCircleView.bottomAnchor, constant: -const)
-        ]
-        
-        NSLayoutConstraint.activate(TCVConstraints)
         
         //Corner radius
         aimsCircleView.layoutIfNeeded()
@@ -199,6 +222,90 @@ class PriorityCircleOverallView: UIView {
         if let view = sender.view as? CircleView {
             delegate?.tapped(on: view)
         }
+    }
+    
+    var rocketsStartPosition = [CGPoint]() {
+        didSet {
+            for position in rocketsStartPosition {
+                let origin = CGPoint(x: position.x - 8, y: position.y - 8)
+                let frame = CGRect(origin: origin, size: CGSize(width: 16, height: 16))
+                let imageView = UIImageView(frame: frame)
+                imageView.image = #imageLiteral(resourceName: "circle2")
+                
+                
+                self.aimsCircleView.insertSubview(imageView, belowSubview: objectivesCircleView)
+            }
+        }
+    }
+    
+    var centerRocketPosition:CGPoint!
+    
+    func centerRocketPositionRelative(to view:UIView) -> CGPoint {
+        return self.convert(centerRocketPosition, to: view)
+    }
+    
+    
+//    enum CircleSides {
+//        case left, center, right
+//    }
+    
+    /// Sets rockets positions relative to PCOView and returns this positions relative to given view.
+    public func setRocketsStartPositions(relativeToView view:UIView) -> [CGPoint] {
+        var positions = [CGPoint]()
+        let radius = Double(aimsCircleView.frame.width / 2) - 9
+        let center = CGPoint(x: self.frame.width/2, y: self.frame.height/2)
+        
+        /// cos(𝚹) = x / r  ==>  x = r * cos(𝚹)
+        /// sin(𝚹) = y / r  ==>  y = r * sin(𝚹)
+        
+        /// MARK: LEFT-SIDE rockets positions
+        for i in stride(from: 180, to: 266, by: 5) {
+
+            /// radians = degrees * π / 180
+            let radians = Double(i) * Double.pi / 180
+
+            let x = Double(center.x) + radius * cos(radians)
+            if x > protrudingWidth {
+                let y = Double(center.y) + radius * sin(radians)
+
+                let point = CGPoint(x: x, y: y)
+                rocketsStartPosition.append(point)
+                positions.append(self.convert(point, to: view))
+            }
+        }
+        
+        /// MARK: RIGHT-SIDE rockets positions
+        for i in stride(from: 275, to: 360, by: 5) {
+            
+            /// radians = degrees * π / 180
+            let radians = Double(i) * Double.pi / 180
+            
+            let x = Double(center.x) + radius * cos(radians)
+            if x < Double(self.frame.width) - protrudingWidth {
+                let y = Double(center.y) + radius * sin(radians)
+                
+                let point = CGPoint(x: x, y: y)
+                rocketsStartPosition.append(point)
+                positions.append(self.convert(point, to: view))
+            }
+        }
+        
+        /// MARK: CENTER rocket position
+        for i in stride(from: 270, to: 271, by: 5) {
+            /// radians = degrees * π / 180
+            let radians = Double(i) * Double.pi / 180
+            
+            let x = Double(center.x) + radius * cos(radians)
+            let y = Double(center.y) + radius * sin(radians)
+            
+            let point = CGPoint(x: x, y: y)
+            centerRocketPosition = point
+            rocketsStartPosition.append(point)
+            positions.append(self.convert(point, to: view))
+        }
+        
+        
+        return positions
     }
     
     

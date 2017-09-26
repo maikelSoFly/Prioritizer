@@ -123,7 +123,7 @@ class TaskSplitter: NSObject {
     
     
     func addTask(title:String, with description:String, priority:TaskPriority, deadline:Date, maxRealizationTime:Measurement<UnitDuration>) {
-        let task = Task(title: title, description: description, priority: priority, deadline: deadline, maxRealizationTime: maxRealizationTime)
+        let task = Task(title: title, description: description, priority: priority, deadline: deadline, maxRealizationTime: maxRealizationTime, color: .red)
         
         switch task.tier {
         case .optional:
