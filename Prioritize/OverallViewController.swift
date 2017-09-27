@@ -17,19 +17,6 @@ class OverallViewController: UIViewController {
     fileprivate var transition:CircularTransition = CircularTransition()
     fileprivate let transitionDuration:TimeInterval = 0.2
     fileprivate var gradientLayer:CAGradientLayer!
-    
-    @objc private func handleShowProgress(value:Double) {
-        if priorityCircleOverallView.state == .normal {
-//            let a = Int.randomInt(min: 0, max: 100)
-//            let b = Int.randomInt(min: 0, max: 100)
-//            let c = Int.randomInt(min: 0, max: 100)
-            
-            
-            priorityCircleOverallView.setProgress(value: value, for: .urgents)
-            priorityCircleOverallView.setProgress(value: value, for: .moderates)
-            priorityCircleOverallView.setProgress(value: value, for: .optionals)
-        }
-    }
     fileprivate var dimView:DimView!
     private var timer:Timer!
     private var timerInterval:TimeInterval = 60  // "It's 5 min!" ~Captain Obvious
@@ -111,12 +98,13 @@ class OverallViewController: UIViewController {
         
         /// Paths View
         
-        rocketsStartPositions = priorityCircleOverallView.setRocketsStartPositions(relativeToView: view)
+        priorityCircleOverallView.setRocketsStartPositions()
+        rocketsStartPositions = priorityCircleOverallView.getRocketsStartPositionsRelative(to: self.view)
         
         let pathsView = PathsView()
         pathsView.backgroundColor = .clear
         pathsView.frame = view.frame
-        let centerRocketPos = priorityCircleOverallView.centerRocketPositionRelative(to: self.view)
+        let centerRocketPos = priorityCircleOverallView.getCenterRocketStartPositionRelative(to: self.view)
         let rocketStart = CGPoint(x: centerRocketPos.x, y: 100.0)
         
         
@@ -124,7 +112,7 @@ class OverallViewController: UIViewController {
             pathsView.addCustomPath(moveTo: rocketStart, endAt: point)
         }
         
-        view.addSubview(pathsView)
+        //view.addSubview(pathsView)
         
     }
 
@@ -197,11 +185,11 @@ class OverallViewController: UIViewController {
     }
     
     override func viewDidAppear(_ animated: Bool) {
-        handleShowProgress(value: 50.0)
+        priorityCircleOverallView.showSectionCircles()
     }
     
     override func viewWillDisappear(_ animated: Bool) {
-       handleShowProgress(value: 0.0)
+        
     }
     
     

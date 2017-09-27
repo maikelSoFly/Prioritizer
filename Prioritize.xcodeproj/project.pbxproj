@@ -23,8 +23,9 @@
 		7F29045B1F6AC053006FB78B /* GradientView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F29045A1F6AC053006FB78B /* GradientView.swift */; };
 		7F467F6D1F79289D00BD81E5 /* PathsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F467F6C1F79289D00BD81E5 /* PathsView.swift */; };
 		7F74D6671F6D879000A46E96 /* DimView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F74D6661F6D879000A46E96 /* DimView.swift */; };
-		7F74D6691F6EE36600A46E96 /* TrayMenuButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F74D6681F6EE36600A46E96 /* TrayMenuButton.swift */; };
-		7F9314AB1F705BBD00E1D8F8 /* Task.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F9314AA1F705BBD00E1D8F8 /* Task.swift */; };
+		7FB0B0D41F7BAB8900E1F8DB /* TrayMenuButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FB0B0D31F7BAB8900E1F8DB /* TrayMenuButton.swift */; };
+		7FB0B0D61F7BAB9500E1F8DB /* Task.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FB0B0D51F7BAB9500E1F8DB /* Task.swift */; };
+		7FB0B0D81F7BABC000E1F8DB /* RocketPathControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FB0B0D71F7BABC000E1F8DB /* RocketPathControl.swift */; };
 		7FBE42CB1F76C95A00C4A526 /* AddTaskView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FBE42CA1F76C95A00C4A526 /* AddTaskView.swift */; };
 		7FD632311F62DC5B00180234 /* TrayMenuViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FD632301F62DC5B00180234 /* TrayMenuViewController.swift */; };
 		7FE74A381F6C11860022CCA2 /* TrayMenuCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FE74A371F6C11860022CCA2 /* TrayMenuCollectionViewCell.swift */; };
@@ -63,8 +64,9 @@
 		7F29045A1F6AC053006FB78B /* GradientView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GradientView.swift; sourceTree = "<group>"; };
 		7F467F6C1F79289D00BD81E5 /* PathsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PathsView.swift; sourceTree = "<group>"; };
 		7F74D6661F6D879000A46E96 /* DimView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DimView.swift; sourceTree = "<group>"; };
-		7F74D6681F6EE36600A46E96 /* TrayMenuButton.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TrayMenuButton.swift; sourceTree = "<group>"; };
-		7F9314AA1F705BBD00E1D8F8 /* Task.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Task.swift; sourceTree = "<group>"; };
+		7FB0B0D31F7BAB8900E1F8DB /* TrayMenuButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = TrayMenuButton.swift; path = Prioritize/TrayMenuButton.swift; sourceTree = "<group>"; };
+		7FB0B0D51F7BAB9500E1F8DB /* Task.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Task.swift; path = Prioritize/Task.swift; sourceTree = "<group>"; };
+		7FB0B0D71F7BABC000E1F8DB /* RocketPathControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = RocketPathControl.swift; path = Prioritize/RocketPathControl.swift; sourceTree = "<group>"; };
 		7FBE42CA1F76C95A00C4A526 /* AddTaskView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddTaskView.swift; sourceTree = "<group>"; };
 		7FD632301F62DC5B00180234 /* TrayMenuViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TrayMenuViewController.swift; sourceTree = "<group>"; };
 		7FE74A371F6C11860022CCA2 /* TrayMenuCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TrayMenuCollectionViewCell.swift; sourceTree = "<group>"; };
@@ -138,9 +140,10 @@
 			isa = PBXGroup;
 			children = (
 				7FE74A391F6C13100022CCA2 /* CircularTransition.swift */,
+				7FB0B0D51F7BAB9500E1F8DB /* Task.swift */,
+				7FB0B0D31F7BAB8900E1F8DB /* TrayMenuButton.swift */,
 				7FE74A3B1F6C13170022CCA2 /* TaskSplitter.swift */,
-				7F74D6681F6EE36600A46E96 /* TrayMenuButton.swift */,
-				7F9314AA1F705BBD00E1D8F8 /* Task.swift */,
+				7FB0B0D71F7BABC000E1F8DB /* RocketPathControl.swift */,
 			);
 			name = Models;
 			path = ..;
@@ -290,20 +293,21 @@
 				7F21463E1F5D96BC00F30E39 /* OverallViewController.swift in Sources */,
 				7FBE42CB1F76C95A00C4A526 /* AddTaskView.swift in Sources */,
 				7F028EF91F60549B007C9A9D /* ModerateTasksViewController.swift in Sources */,
+				7FB0B0D81F7BABC000E1F8DB /* RocketPathControl.swift in Sources */,
 				7FE74A381F6C11860022CCA2 /* TrayMenuCollectionViewCell.swift in Sources */,
 				7F028EF31F5F08A8007C9A9D /* Extensions.swift in Sources */,
 				7FE74A3C1F6C13170022CCA2 /* TaskSplitter.swift in Sources */,
 				7F467F6D1F79289D00BD81E5 /* PathsView.swift in Sources */,
 				7F21463C1F5D96BC00F30E39 /* AppDelegate.swift in Sources */,
 				7F74D6671F6D879000A46E96 /* DimView.swift in Sources */,
+				7FB0B0D61F7BAB9500E1F8DB /* Task.swift in Sources */,
 				7F028EFB1F6054A7007C9A9D /* OptionalTasksViewController.swift in Sources */,
 				7F2146661F5DC09700F30E39 /* PriorityCircleOverallView.swift in Sources */,
 				7F29045B1F6AC053006FB78B /* GradientView.swift in Sources */,
 				7F27E22F1F75127F00FAAD95 /* RadialGradientView.swift in Sources */,
 				7FD632311F62DC5B00180234 /* TrayMenuViewController.swift in Sources */,
 				7F2146441F5D96BC00F30E39 /* Prioritize.xcdatamodeld in Sources */,
-				7F9314AB1F705BBD00E1D8F8 /* Task.swift in Sources */,
-				7F74D6691F6EE36600A46E96 /* TrayMenuButton.swift in Sources */,
+				7FB0B0D41F7BAB8900E1F8DB /* TrayMenuButton.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
