@@ -30,11 +30,8 @@ class RadialGradientView: UIView {
         let gradient = CGGradient(colorsSpace: nil, colors: colors, locations: nil)
         let context = UIGraphicsGetCurrentContext()
         
-        
-        
-        
         context?.drawRadialGradient(gradient!, startCenter: center, startRadius: 0.0, endCenter: center, endRadius: endRadius, options: CGGradientDrawingOptions.drawsBeforeStartLocation)
-      
-        
     }
+    
+    
 }

@@ -28,6 +28,8 @@ class OverallViewController: UIViewController {
         }
     }
     private var rocketsStartPositions = [CGPoint]()
+    private var rocketLaunchPosition:CGPoint!
+    private var pathsGenerator:PathsGenerator!
     
     
     
@@ -41,7 +43,7 @@ class OverallViewController: UIViewController {
         view.layer.cornerRadius = 5
         
         
-        /// Initializing Task Splitter.
+        //MARK: - Initializing Task Splitter.
         view.bringSubview(toFront: priorityCircleOverallView)
         
         priorityCircleOverallView.translatesAutoresizingMaskIntoConstraints = false
@@ -58,13 +60,13 @@ class OverallViewController: UIViewController {
         priorityCircleOverallView.setUp(for: taskSplitter!)
         
         
-        /// Tray menu.
+        //MARK: - Tray menu.
         view.bringSubview(toFront: menuBarView)
     
 //🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰
 //   Process of adding Tray Menu with buttons and dim.
         
-        /// Dim View
+        //MARK: - Dim View
         dimView = DimView(in: self.view, forTrayView: menuBarView, withStyle: .top)
         menuBar.dimView = dimView
         dimView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(respondToDimViewTap(sender:))))
@@ -83,7 +85,7 @@ class OverallViewController: UIViewController {
 
         menuBar.addControls(controls: arr)
         
-        /// Button targets
+        //MARK: - Button targets
         
         btn1.addTarget(self, action: #selector(addTask(sender:)), for: .touchUpInside)
         //btn3.addTarget(self, action: #selector(handleShowProgressButton), for: .touchUpInside)
@@ -92,27 +94,17 @@ class OverallViewController: UIViewController {
 //🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰
         
 
-        /// Scheduled Timer
+        //MARK: - Scheduled Timer
         timer = Timer.scheduledTimer(timeInterval: timerInterval, target: self, selector: #selector(self.updateTimer(timer:)), userInfo: nil, repeats: true)
     
         
-        /// Paths View
+        //MARK: - Rockets 🚀
         
         priorityCircleOverallView.setRocketsStartPositions()
         rocketsStartPositions = priorityCircleOverallView.getRocketsStartPositionsRelative(to: self.view)
-        
-        let pathsView = PathsView()
-        pathsView.backgroundColor = .clear
-        pathsView.frame = view.frame
         let centerRocketPos = priorityCircleOverallView.getCenterRocketStartPositionRelative(to: self.view)
-        let rocketStart = CGPoint(x: centerRocketPos.x, y: 100.0)
-        
-        
-        for point in rocketsStartPositions {
-            pathsView.addCustomPath(moveTo: rocketStart, endAt: point)
-        }
-        
-        //view.addSubview(pathsView)
+        rocketLaunchPosition = CGPoint(x: centerRocketPos.x, y: 0)
+        pathsGenerator = PathsGenerator(startPoint: rocketLaunchPosition, endPoints: rocketsStartPositions)
         
     }
 
@@ -154,9 +146,35 @@ class OverallViewController: UIViewController {
         label.centerXAnchor.constraint(equalTo: testView.centerXAnchor).isActive = true
         label.centerYAnchor.constraint(equalTo: testView.centerYAnchor).isActive = true
         
+        let button = UIButton()
+        button.setTitle("Launch 🚀", for: .normal)
+        button.translatesAutoresizingMaskIntoConstraints = false
+        testView.addSubview(button)
+        button.centerXAnchor.constraint(equalTo: testView.centerXAnchor).isActive = true
+        button.topAnchor.constraint(equalTo: label.bottomAnchor, constant: 40).isActive = true
+        button.addTarget(self, action: #selector(launchRocket), for: .touchUpInside)
+        
         
         menuBar.expand(withView: testView)
     }
+    
+    @objc private func launchRocket() {
+        menuBar.closeFromEditing()
+        let frame = CGRect(origin: rocketLaunchPosition, size: CGSize(width: 30, height: 30))
+        
+        let rocket = Rocket(frame: frame)
+        rocket.delegate = self
+        rocket.image = #imageLiteral(resourceName: "rocket-1")
+        view.insertSubview(rocket, belowSubview: menuBarView)
+        let paths = pathsGenerator.pathsDictionary
+        let randNum = Int(arc4random_uniform(UInt32(rocketsStartPositions.count)) + UInt32(0))
+        let endPoint = NSValue(cgPoint: rocketsStartPositions[randNum])
+        
+        
+        rocket.fly(from: rocketLaunchPosition, withPath: paths[endPoint]!, rotateTowardsBlackHole: priorityCircleOverallView.center)
+    }
+    
+    
     
     override var preferredStatusBarUpdateAnimation: UIStatusBarAnimation{
         return .slide
@@ -185,11 +203,11 @@ class OverallViewController: UIViewController {
     }
     
     override func viewDidAppear(_ animated: Bool) {
-        priorityCircleOverallView.showSectionCircles()
+        priorityCircleOverallView.showSectionCircles(bool: true)
     }
     
-    override func viewWillDisappear(_ animated: Bool) {
-        
+    override func viewDidDisappear(_ animated: Bool) {
+        priorityCircleOverallView.showSectionCircles(bool: false)
     }
     
     
@@ -266,6 +284,15 @@ extension OverallViewController:TrayMenuDelegate {
         } else {
             isStatusBarHidden = true
         }
+    }
+}
+
+extension OverallViewController:RocketDelegate {
+    func rocketLanded(rocket:Rocket, on position:CGPoint) {
+        let positionRelatedToPCOV = view.convert(position, to: priorityCircleOverallView)
+        rocket.center = CGPoint(x: positionRelatedToPCOV.x, y: positionRelatedToPCOV.y)
+        rocket.removeFromSuperview()
+        priorityCircleOverallView.addRocket(rocket: rocket)
     }
 }
 

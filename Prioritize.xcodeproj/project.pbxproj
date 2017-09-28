@@ -25,7 +25,8 @@
 		7F74D6671F6D879000A46E96 /* DimView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7F74D6661F6D879000A46E96 /* DimView.swift */; };
 		7FB0B0D41F7BAB8900E1F8DB /* TrayMenuButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FB0B0D31F7BAB8900E1F8DB /* TrayMenuButton.swift */; };
 		7FB0B0D61F7BAB9500E1F8DB /* Task.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FB0B0D51F7BAB9500E1F8DB /* Task.swift */; };
-		7FB0B0D81F7BABC000E1F8DB /* RocketPathControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FB0B0D71F7BABC000E1F8DB /* RocketPathControl.swift */; };
+		7FB0B0D81F7BABC000E1F8DB /* Rocket.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FB0B0D71F7BABC000E1F8DB /* Rocket.swift */; };
+		7FB0B0DA1F7BC1C800E1F8DB /* PathsGenerator.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FB0B0D91F7BC1C800E1F8DB /* PathsGenerator.swift */; };
 		7FBE42CB1F76C95A00C4A526 /* AddTaskView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FBE42CA1F76C95A00C4A526 /* AddTaskView.swift */; };
 		7FD632311F62DC5B00180234 /* TrayMenuViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FD632301F62DC5B00180234 /* TrayMenuViewController.swift */; };
 		7FE74A381F6C11860022CCA2 /* TrayMenuCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7FE74A371F6C11860022CCA2 /* TrayMenuCollectionViewCell.swift */; };
@@ -66,7 +67,8 @@
 		7F74D6661F6D879000A46E96 /* DimView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DimView.swift; sourceTree = "<group>"; };
 		7FB0B0D31F7BAB8900E1F8DB /* TrayMenuButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = TrayMenuButton.swift; path = Prioritize/TrayMenuButton.swift; sourceTree = "<group>"; };
 		7FB0B0D51F7BAB9500E1F8DB /* Task.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Task.swift; path = Prioritize/Task.swift; sourceTree = "<group>"; };
-		7FB0B0D71F7BABC000E1F8DB /* RocketPathControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = RocketPathControl.swift; path = Prioritize/RocketPathControl.swift; sourceTree = "<group>"; };
+		7FB0B0D71F7BABC000E1F8DB /* Rocket.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = Rocket.swift; path = Prioritize/Rocket.swift; sourceTree = "<group>"; };
+		7FB0B0D91F7BC1C800E1F8DB /* PathsGenerator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = PathsGenerator.swift; path = Prioritize/PathsGenerator.swift; sourceTree = "<group>"; };
 		7FBE42CA1F76C95A00C4A526 /* AddTaskView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AddTaskView.swift; sourceTree = "<group>"; };
 		7FD632301F62DC5B00180234 /* TrayMenuViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TrayMenuViewController.swift; sourceTree = "<group>"; };
 		7FE74A371F6C11860022CCA2 /* TrayMenuCollectionViewCell.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TrayMenuCollectionViewCell.swift; sourceTree = "<group>"; };
@@ -143,7 +145,8 @@
 				7FB0B0D51F7BAB9500E1F8DB /* Task.swift */,
 				7FB0B0D31F7BAB8900E1F8DB /* TrayMenuButton.swift */,
 				7FE74A3B1F6C13170022CCA2 /* TaskSplitter.swift */,
-				7FB0B0D71F7BABC000E1F8DB /* RocketPathControl.swift */,
+				7FB0B0D71F7BABC000E1F8DB /* Rocket.swift */,
+				7FB0B0D91F7BC1C800E1F8DB /* PathsGenerator.swift */,
 			);
 			name = Models;
 			path = ..;
@@ -293,10 +296,11 @@
 				7F21463E1F5D96BC00F30E39 /* OverallViewController.swift in Sources */,
 				7FBE42CB1F76C95A00C4A526 /* AddTaskView.swift in Sources */,
 				7F028EF91F60549B007C9A9D /* ModerateTasksViewController.swift in Sources */,
-				7FB0B0D81F7BABC000E1F8DB /* RocketPathControl.swift in Sources */,
+				7FB0B0D81F7BABC000E1F8DB /* Rocket.swift in Sources */,
 				7FE74A381F6C11860022CCA2 /* TrayMenuCollectionViewCell.swift in Sources */,
 				7F028EF31F5F08A8007C9A9D /* Extensions.swift in Sources */,
 				7FE74A3C1F6C13170022CCA2 /* TaskSplitter.swift in Sources */,
+				7FB0B0DA1F7BC1C800E1F8DB /* PathsGenerator.swift in Sources */,
 				7F467F6D1F79289D00BD81E5 /* PathsView.swift in Sources */,
 				7F21463C1F5D96BC00F30E39 /* AppDelegate.swift in Sources */,
 				7F74D6671F6D879000A46E96 /* DimView.swift in Sources */,

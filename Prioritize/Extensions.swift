@@ -81,5 +81,20 @@ extension CGFloat {
     func remap(from1:CGFloat, to1:CGFloat, from2:CGFloat, to2:CGFloat) -> CGFloat {
         return (self - from1) / (to1 - from1) * (to2 - from2) + from2
     }
+    
+    var degrees: CGFloat {
+        return self * CGFloat(180.0 / CGFloat.pi)
+    }
 }
+
+extension CGPoint {
+    func angle(to comparisonPoint: CGPoint) -> CGFloat {
+        let angle = atan2f(Float(comparisonPoint.y - self.y), Float(comparisonPoint.x - self.x))
+        return CGFloat(angle)
+    }
+    
+    
+}
+
+
 

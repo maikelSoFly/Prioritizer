@@ -12,7 +12,6 @@ class CircleView:UIView {
     var color:UIColor
     var taskType:TaskType
     var isOpened = false
-        
     
     
     // "Makes" bounds circular. It is neccessary for tap gesture to distinguish which circle is tapped
@@ -22,8 +21,15 @@ class CircleView:UIView {
     }
     
     lazy var sectionCircleView:RadialGradientView = {
-        let inColor = UIColor.makeLighterColor(of: self.color, by: -0.3).withAlphaComponent((self.taskType == .urgent || self.taskType == .optional ? 0.2 : 1.0))
-        let outColor = UIColor.makeLighterColor(of: self.color, by: 0.2).withAlphaComponent( (self.taskType == .urgent || self.taskType == .optional ? 0.25 : 0.8) )
+        let inColor:UIColor, outColor:UIColor
+        
+        if taskType == .urgent {
+            inColor = .black
+            outColor = color
+        } else {
+            inColor = UIColor.makeLighterColor(of: self.color, by: -0.3).withAlphaComponent( self.taskType == .optional ? 0.2 : 1.0 )
+            outColor = UIColor.makeLighterColor(of: self.color, by: 0.2).withAlphaComponent(  self.taskType == .optional ? 0.25 : 0.8 )
+        }
         
         let frame = setFrameForSectionCircle()
         let view = RadialGradientView(frame: frame, insideColor: inColor, outsideColor: outColor)
@@ -41,15 +47,16 @@ class CircleView:UIView {
     private func setFrameForSectionCircle() -> CGRect {
         var SCFrame:CGRect
         
-        for subview in subviews {
-            if let sub = subview as? CircleView {
-                if taskType == .urgent {
-                    SCFrame = CGRect(origin: frame.origin, size: CGSize(width: frame.width/2, height: frame.height/2))
-                } else {
+        if taskType == .urgent {
+            return CGRect(origin: frame.origin, size: CGSize(width: frame.width/2, height: frame.height/2))
+        } else {
+            for subview in subviews {
+                if let sub = subview as? CircleView {
                     let difference = (sub.frame.height - frame.height) / 2
                     SCFrame = CGRect(origin: frame.origin, size: CGSize(width: frame.width+difference, height: frame.height+difference))
+                
+                    return SCFrame
                 }
-                 return SCFrame
             }
         }
        
@@ -84,13 +91,16 @@ class CircleView:UIView {
     }
     
     
-    public func showSectionCircleInside() {
-        sectionCircleView.transform = CGAffineTransform(scaleX: 0.001, y: 0.001)
-        
-        UIView.animate(withDuration: 0.5, delay: 0, options: .curveEaseInOut, animations: {
-            self.sectionCircleView.transform = CGAffineTransform.identity
-        }, completion: nil)
+    public func showSectionCircleInside(bool:Bool) {
+        if bool {
+            UIView.animate(withDuration: 0.5, delay: 0, options: .curveEaseInOut, animations: {
+                self.sectionCircleView.transform = CGAffineTransform.identity
+            }, completion: nil)
+        } else { /// Non-animated for optimalization purposes.
+            sectionCircleView.transform = CGAffineTransform(scaleX: 0.001, y: 0.001)
+        }
     }
+    
 }
 
 
@@ -109,6 +119,7 @@ class PriorityCircleOverallView: UIView {
     private var title:String!
     private var _state:PriorityCircleOverallState = .normal
     var protrudingWidth:Double = 0
+    var isLaidout = false
     var state:PriorityCircleOverallState {
         set {
              _state = newValue
@@ -120,18 +131,9 @@ class PriorityCircleOverallView: UIView {
     var delegate:PriorityCircleOverallDelegate?
     /// Colors of tiers; [urgent, moderate, optional]
     private let colors = [#colorLiteral(red: 0.142003311, green: 0.1434092844, blue: 0.1434092844, alpha: 1), #colorLiteral(red: 0.7456802726, green: 0.06953835487, blue: 0.2190275192, alpha: 1), #colorLiteral(red: 0.921431005, green: 0.9214526415, blue: 0.9214410186, alpha: 1).withAlphaComponent(0.6)]
-    var rocketsStartPositions = [CGPoint]() {
-        didSet {
-            for position in rocketsStartPositions {
-                let origin = CGPoint(x: position.x - 8, y: position.y - 8)
-                let frame = CGRect(origin: origin, size: CGSize(width: 16, height: 16))
-                let imageView = UIImageView(frame: frame)
-                imageView.image = #imageLiteral(resourceName: "circle2")
-                
-                self.ergosphereCircleView.insertSubview(imageView, belowSubview: eventHorizonCircleView)
-            }
-        }
-    }
+    var rocketsStartPositions = [CGPoint]() 
+        
+    
     var centerRocketStartPosition:CGPoint!
     
     
@@ -150,10 +152,10 @@ class PriorityCircleOverallView: UIView {
         super.init(coder: aDecoder)
     }
     
-    func showSectionCircles() {
-        ergosphereCircleView.showSectionCircleInside()
-        eventHorizonCircleView.showSectionCircleInside()
-        singularityCircleView.showSectionCircleInside()
+    func showSectionCircles(bool:Bool) {
+        ergosphereCircleView.showSectionCircleInside(bool: bool)
+        eventHorizonCircleView.showSectionCircleInside(bool: bool)
+        singularityCircleView.showSectionCircleInside(bool: bool)
     }
     
     public func setUp(for splitter:TaskSplitter) {
@@ -175,7 +177,7 @@ class PriorityCircleOverallView: UIView {
         
         let const:CGFloat = self.frame.width / 3
         protrudingWidth = Double(const/2)
-        print(const)
+    
         let circlesConstraints:[NSLayoutConstraint] = [
             ergosphereCircleView.widthAnchor.constraint(equalTo: self.widthAnchor),
             ergosphereCircleView.heightAnchor.constraint(equalTo: self.heightAnchor),
@@ -197,11 +199,17 @@ class PriorityCircleOverallView: UIView {
         
         
         
-        //Corner radius
+        //MARK: - Corner radius
         ergosphereCircleView.layoutIfNeeded()
         ergosphereCircleView.layer.cornerRadius = ergosphereCircleView.frame.size.width/2
         eventHorizonCircleView.layer.cornerRadius = eventHorizonCircleView.frame.size.width/2
         singularityCircleView.layer.cornerRadius = singularityCircleView.frame.size.width/2
+        
+        //MARK: - SectionCircleViews layout
+        ergosphereCircleView.sectionCircleView.layoutIfNeeded()
+        eventHorizonCircleView.sectionCircleView.layoutIfNeeded()
+        singularityCircleView.sectionCircleView.layoutIfNeeded()
+        
         
         
         //Tap gesture - Making 3 separate gesture recognizers is neccessary
@@ -241,7 +249,7 @@ class PriorityCircleOverallView: UIView {
     
     /// Sets rockets positions relative to this view.
     public func setRocketsStartPositions() {
-        let radius = Double(ergosphereCircleView.frame.width / 2) - 9
+        let radius = Double(ergosphereCircleView.frame.width / 2)
         let center = CGPoint(x: self.frame.width/2, y: self.frame.height/2)
         
         /// cos(𝚹) = x / r  ==>  x = r * cos(𝚹)
@@ -286,6 +294,10 @@ class PriorityCircleOverallView: UIView {
         let point = CGPoint(x: x, y: y)
         centerRocketStartPosition = point
         rocketsStartPositions.append(point)
+    }
+    
+    func addRocket(rocket:Rocket) {
+        self.ergosphereCircleView.insertSubview(rocket, belowSubview: eventHorizonCircleView)
     }
     
     

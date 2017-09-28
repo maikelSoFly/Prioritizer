@@ -343,6 +343,28 @@ class TrayMenuViewController: UIViewController {
         })
     }
     
+    func closeFromEditing() {
+        state = .closing
+        closeCustomView()
+        state = .closing
+        ///  CLOSE
+        UIView.animate(withDuration: 0.3, delay: 0, options: .curveEaseInOut, animations: {
+            if self.style == .discreet {
+                self.blurView.alpha = 0.0
+            }
+            self.container.alpha = 0.0
+            if self.dimView != nil {
+                self.dimView.alpha = 0.0
+            }
+        }, completion: nil)
+        
+        UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 0.5, initialSpringVelocity: 3, options: .curveEaseInOut, animations: {
+            self.setCenter(self.trayClosed)
+        }, completion: { (success) in
+            self.state = .closed
+        })
+    }
+    
     @objc func use() {
         
         if state == .expanded {
