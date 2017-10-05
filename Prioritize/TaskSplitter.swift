@@ -9,7 +9,6 @@
 import UIKit
 
 class TaskSplitter: NSObject {
-    var priorityCircleColors:[UIColor]
     var title:String
     var urgents:[Task]
     var moderates:[Task]
@@ -23,20 +22,17 @@ class TaskSplitter: NSObject {
     
     
     /// Initializing empty goal
-    init(title:String, priorityCircleColors:[UIColor]) {
+    init(title:String) {
         self.title = title
-        self.priorityCircleColors = priorityCircleColors
         self.urgents = [Task]()
         self.moderates = [Task]()
         self.optionals = [Task]()
         self.outdated = [Task]()
-    
     }
     
     /// Initializing goal with existing aims, objectives and targets
-    init(title:String, priorityCircleColors:[UIColor], urgents:[Task], moderates:[Task], optionals:[Task]) {
+    init(title:String, urgents:[Task], moderates:[Task], optionals:[Task]) {
         self.title = title
-        self.priorityCircleColors = priorityCircleColors
         self.urgents = urgents
         self.moderates = moderates
         self.optionals = optionals
@@ -46,7 +42,6 @@ class TaskSplitter: NSObject {
     /// Copying existing goal
     init(splitter:TaskSplitter) {
         self.title = splitter.title
-        self.priorityCircleColors = splitter.priorityCircleColors
         self.urgents = splitter.urgents
         self.moderates = splitter.moderates
         self.optionals = splitter.optionals

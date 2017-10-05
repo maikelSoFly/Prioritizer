@@ -89,8 +89,9 @@ extension CGFloat {
 
 extension CGPoint {
     func angle(to comparisonPoint: CGPoint) -> CGFloat {
-        let angle = atan2f(Float(comparisonPoint.y - self.y), Float(comparisonPoint.x - self.x))
-        return CGFloat(angle)
+        let angle = atan2(comparisonPoint.y - self.y, comparisonPoint.x - self.x)
+        
+        return angle
     }
     
     

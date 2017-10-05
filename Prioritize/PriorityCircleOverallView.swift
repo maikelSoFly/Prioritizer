@@ -25,7 +25,7 @@ class CircleView:UIView {
         
         if taskType == .urgent {
             inColor = .black
-            outColor = color
+            outColor = UIColor.makeLighterColor(of: color, by: 0.03)
         } else {
             inColor = UIColor.makeLighterColor(of: self.color, by: -0.3).withAlphaComponent( self.taskType == .optional ? 0.2 : 1.0 )
             outColor = UIColor.makeLighterColor(of: self.color, by: 0.2).withAlphaComponent(  self.taskType == .optional ? 0.25 : 0.8 )
@@ -48,7 +48,7 @@ class CircleView:UIView {
         var SCFrame:CGRect
         
         if taskType == .urgent {
-            return CGRect(origin: frame.origin, size: CGSize(width: frame.width/2, height: frame.height/2))
+            return CGRect(origin: frame.origin, size: CGSize(width: frame.width, height: frame.height))
         } else {
             for subview in subviews {
                 if let sub = subview as? CircleView {
@@ -255,7 +255,7 @@ class PriorityCircleOverallView: UIView {
         /// cos(𝚹) = x / r  ==>  x = r * cos(𝚹)
         /// sin(𝚹) = y / r  ==>  y = r * sin(𝚹)
         
-        /// MARK: LEFT-SIDE rockets positions
+        /// MARK: LHS rockets positions
         for i in stride(from: 180, to: 266, by: 5) {
 
             /// radians = degrees * π / 180
@@ -270,7 +270,7 @@ class PriorityCircleOverallView: UIView {
             }
         }
         
-        /// MARK: RIGHT-SIDE rockets positions
+        /// MARK: RHS rockets positions
         for i in stride(from: 275, to: 360, by: 5) {
       
             let radians = Double(i) * Double.pi / 180

@@ -19,7 +19,7 @@ class OverallViewController: UIViewController {
     fileprivate var gradientLayer:CAGradientLayer!
     fileprivate var dimView:DimView!
     private var timer:Timer!
-    private var timerInterval:TimeInterval = 60  // "It's 5 min!" ~Captain Obvious
+    private var timerInterval:TimeInterval = 60
     private var isStatusBarHidden:Bool = false {
         didSet{
             UIView.animate(withDuration: 0.5) { () -> Void in
@@ -30,6 +30,13 @@ class OverallViewController: UIViewController {
     private var rocketsStartPositions = [CGPoint]()
     private var rocketLaunchPosition:CGPoint!
     private var pathsGenerator:PathsGenerator!
+    private var nextButton:UIButton = {
+       let button = UIButton()
+        button.setImage(#imageLiteral(resourceName: "ok").withRenderingMode(.alwaysTemplate), for: .normal)
+        button.tintColor = UIColor.white.withAlphaComponent(0.68)
+        button.addTarget(self, action: #selector(launchRocket), for: .touchUpInside)
+        return button
+    }()
     
     
     
@@ -56,7 +63,7 @@ class OverallViewController: UIViewController {
         
         priorityCircleOverallView.isUserInteractionEnabled = true
         priorityCircleOverallView.delegate = self
-        taskSplitter = TaskSplitter(title: "Main Task Splitter", priorityCircleColors: UIColor.defaultAppColors())
+        taskSplitter = TaskSplitter(title: "Main Task Splitter")
         priorityCircleOverallView.setUp(for: taskSplitter!)
         
         
@@ -128,34 +135,34 @@ class OverallViewController: UIViewController {
     }
     
     @objc func respondToDimViewTap(sender:UITapGestureRecognizer) {
-        menuBar.use()
+        if menuBar.state != .expanded {
+            menuBar.use()
+        }
     }
     
     @objc func addTask(sender:TrayMenuButton) {
+        let addView = AddTaskView()
+        addView.delegate = self
         
-        let testView = UIView(frame: .zero)
+        menuBar.expand(withView: addView)
         
-        testView.backgroundColor = UIColor.white.withAlphaComponent(0.1)
-        let label = UILabel()
-        label.text = "Coming soon..."
-        label.font = UIFont(name: "Helvetica-Bold", size: 14)
-        testView.addSubview(label)
-        label.textColor = .white
-        label.translatesAutoresizingMaskIntoConstraints = false
+        //MARK: - 'Next' button
+        nextButton.translatesAutoresizingMaskIntoConstraints = false
         
-        label.centerXAnchor.constraint(equalTo: testView.centerXAnchor).isActive = true
-        label.centerYAnchor.constraint(equalTo: testView.centerYAnchor).isActive = true
+        view.addSubview(nextButton)
         
-        let button = UIButton()
-        button.setTitle("Launch 🚀", for: .normal)
-        button.translatesAutoresizingMaskIntoConstraints = false
-        testView.addSubview(button)
-        button.centerXAnchor.constraint(equalTo: testView.centerXAnchor).isActive = true
-        button.topAnchor.constraint(equalTo: label.bottomAnchor, constant: 40).isActive = true
-        button.addTarget(self, action: #selector(launchRocket), for: .touchUpInside)
+        nextButton.widthAnchor.constraint(equalToConstant: 55).isActive = true
+        nextButton.heightAnchor.constraint(equalToConstant: 55).isActive = true
+        nextButton.centerXAnchor.constraint(equalTo: view.centerXAnchor).isActive = true
+        let const = view.frame.height - (menuBarView.frame.origin.y + menuBarView.frame.height)
+        nextButton.centerYAnchor.constraint(equalTo: menuBarView.bottomAnchor, constant: const/2).isActive = true
         
+        nextButton.layer.masksToBounds = false
+        nextButton.layer.shadowColor = UIColor.black.cgColor
+        nextButton.layer.shadowRadius = 15
+        nextButton.layer.shadowOpacity = 0.55
+        nextButton.layer.cornerRadius = nextButton.frame.width/2
         
-        menuBar.expand(withView: testView)
     }
     
     @objc private func launchRocket() {
@@ -164,7 +171,7 @@ class OverallViewController: UIViewController {
         
         let rocket = Rocket(frame: frame)
         rocket.delegate = self
-        rocket.image = #imageLiteral(resourceName: "rocket-1")
+        rocket.image = #imageLiteral(resourceName: "rock3t")
         view.insertSubview(rocket, belowSubview: menuBarView)
         let paths = pathsGenerator.pathsDictionary
         let randNum = Int(arc4random_uniform(UInt32(rocketsStartPositions.count)) + UInt32(0))
@@ -274,12 +281,12 @@ extension OverallViewController:UIViewControllerTransitioningDelegate {
 }
 
 extension OverallViewController:TrayMenuDelegate {
-    func updateLayout() {
-        view.layoutIfNeeded()
+    func menuDidEndEditing() {
+        nextButton.removeFromSuperview()
     }
-    
+   
     func stateChanged(state: TrayMenuState) {
-        if state == .closed || state == .closing || state == .showing {
+        if state == .closed || state == .closing || state == .showing || state == .expanded {
             isStatusBarHidden = false
         } else {
             isStatusBarHidden = true
@@ -293,6 +300,12 @@ extension OverallViewController:RocketDelegate {
         rocket.center = CGPoint(x: positionRelatedToPCOV.x, y: positionRelatedToPCOV.y)
         rocket.removeFromSuperview()
         priorityCircleOverallView.addRocket(rocket: rocket)
+    }
+}
+
+extension OverallViewController:AddTaskViewDelegate {
+    func launch() {
+        launchRocket()
     }
 }
 

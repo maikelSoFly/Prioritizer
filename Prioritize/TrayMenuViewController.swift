@@ -9,12 +9,12 @@
 import UIKit
 
 @objc protocol TrayMenuDelegate {
-    //Implement layoutIfNeeded() in controller containing this tray menu
-    func updateLayout()
     
     @objc optional func stateChanged(state:TrayMenuState)
     
     @objc optional func centerPosition(_ y:CGPoint)
+    
+    @objc optional func menuDidEndEditing()
 }
 
 @objc enum TrayMenuState: Int {
@@ -62,7 +62,7 @@ class TrayMenuViewController: UIViewController {
         button.heightAnchor.constraint(equalToConstant: 30).isActive = true
         button.widthAnchor.constraint(equalToConstant: 30).isActive = true
         button.alpha = 1.0
-        button.addTarget(self, action: #selector(self.cancelMenuEditing), for: .touchUpInside)
+        button.addTarget(self, action: #selector(self.use), for: .touchUpInside)
         
         return button
     }()
@@ -99,16 +99,12 @@ class TrayMenuViewController: UIViewController {
     }
     public var state:TrayMenuState = .closed {
         didSet {
-        
             delegate.stateChanged?(state: state)
             
             if state == .expanded {
                 label.text = "CANCEL"
                 actionButton.setBackgroundImage(#imageLiteral(resourceName: "close").withRenderingMode(.alwaysTemplate), for: .normal)
-                return
-            }
-            
-            if state == .opened {
+            } else if state == .opened {
                 label.text = "CLOSE"
                 possibleDirectionState = placement == .top ? .upwards : .downwards
             } else if state != .closing && state != .moving {
@@ -131,6 +127,7 @@ class TrayMenuViewController: UIViewController {
         }
     }
     private var mySuperview:UIView!
+    private var customView:UIView!
     
     
     enum IndicatorDirection {
@@ -176,6 +173,9 @@ class TrayMenuViewController: UIViewController {
     
     @objc func tap(sender:UITapGestureRecognizer) {
         print("Tapped on tray")
+        if customView != nil {
+            customView.endEditing(true)
+        }
     }
 
     override func didReceiveMemoryWarning() {
@@ -292,8 +292,6 @@ class TrayMenuViewController: UIViewController {
         sender.setTranslation(.zero, in: view)
     }
     
-    
-    
     private func setCenter(_ center:CGPoint) {
         mySuperview.center = center
         
@@ -317,98 +315,22 @@ class TrayMenuViewController: UIViewController {
             self.customView.removeFromSuperview()
             self.customView = nil
         }
-    }
-    
-    @objc func cancelMenuEditing() {
-        /// TODO
-        if state != .expanded {
-            use()
-            return
-        }
-        
-        state = .moving
-        closeCustomView()
-        
-        UIView.animate(withDuration: 0.3, delay: 0, options: .curveEaseInOut, animations: {
-            if self.style == .discreet {
-                self.blurView.alpha = 1.0
-            }
-        }, completion: nil)
-        
-        UIView.animate(withDuration: 0.3, delay: 0, options: .curveEaseInOut, animations: {
-            self.setCenter(self.trayOpened)
-            self.container.alpha = 1.0
-        }, completion: { (success) in
-            self.state = .opened
-        })
+        delegate.menuDidEndEditing?()
     }
     
     func closeFromEditing() {
-        state = .closing
         closeCustomView()
-        state = .closing
-        ///  CLOSE
-        UIView.animate(withDuration: 0.3, delay: 0, options: .curveEaseInOut, animations: {
-            if self.style == .discreet {
-                self.blurView.alpha = 0.0
-            }
-            self.container.alpha = 0.0
-            if self.dimView != nil {
-                self.dimView.alpha = 0.0
-            }
-        }, completion: nil)
-        
-        UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 0.5, initialSpringVelocity: 3, options: .curveEaseInOut, animations: {
-            self.setCenter(self.trayClosed)
-        }, completion: { (success) in
-            self.state = .closed
-        })
+        closeMenu(duration: 0.4)
     }
     
     @objc func use() {
-        
         if state == .expanded {
-            return
-        }
-        
-        if state == .closed {
-            state = .moving
-            ///  OPEN
-            UIView.animate(withDuration: 0.4, delay: 0, options: .curveEaseInOut, animations: {
-                if self.style == .discreet {
-                    self.blurView.alpha = 1.0
-                }
-                self.container.alpha = 1.0
-                if self.dimView != nil {
-                    self.dimView.alpha = 0.35
-                }
-            }, completion: nil)
-            
-            
-            UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 0.5, initialSpringVelocity: 3, options: .curveEaseInOut, animations: {
-                self.setCenter(self.trayOpened)
-            }, completion: { (success) in
-                self.state = .opened
-            })
-            
+            closeCustomView()
+            openMenu(duration: 0.4)
+        } else if state == .closed {
+            openMenu(duration: 0.4)
         } else {
-            state = .closing
-            ///  CLOSE
-            UIView.animate(withDuration: 0.3, delay: 0, options: .curveEaseInOut, animations: {
-                if self.style == .discreet {
-                    self.blurView.alpha = 0.0
-                }
-                self.container.alpha = 0.0
-                if self.dimView != nil {
-                    self.dimView.alpha = 0.0
-                }
-            }, completion: nil)
-            
-            UIView.animate(withDuration: 0.5, delay: 0, usingSpringWithDamping: 0.5, initialSpringVelocity: 3, options: .curveEaseInOut, animations: {
-                self.setCenter(self.trayClosed)
-            }, completion: { (success) in
-                self.state = .closed
-            })
+            closeMenu(duration: 0.4)
         }
     }
     
@@ -423,11 +345,7 @@ class TrayMenuViewController: UIViewController {
             mySuperview.center = CGPoint(x: mySuperview.center.x, y: y)
         }
         
-        if state == .expanded && mySuperview.center.y <= trayOpened.y {
-            state = .opened
-        }
 
-        
         // Fading dim view if exists
         if let dim = dimView {
             dim.frame.origin = placement == .bottom ? CGPoint(x: mySuperview.frame.origin.x, y: mySuperview.frame.origin.y - UIScreen.main.bounds.height) : mySuperview.frame.origin
@@ -441,62 +359,56 @@ class TrayMenuViewController: UIViewController {
                 blurView.alpha = alpha
             }
             container.alpha = alpha
-            
         }
     }
     
     
+    fileprivate func openMenu(duration time: CGFloat) {
+        state = .moving
+        UIView.animate(withDuration: TimeInterval(time), delay: 0, options: .curveEaseInOut, animations: {
+            if self.style == .discreet {
+                self.blurView.alpha = 1.0
+            }
+            self.container.alpha = 1.0
+            if self.dimView != nil {
+                self.dimView.alpha = 0.35
+            }
+        }, completion: nil)
+        
+        UIView.animate(withDuration: TimeInterval(time), delay: 0, usingSpringWithDamping: 0.5, initialSpringVelocity: time, options: .curveEaseOut, animations: {
+            self.setCenter(self.trayOpened)
+        }, completion: {(success) in
+            self.state = .opened
+        })
+    }
+    
+    fileprivate func closeMenu(duration time: CGFloat) {
+        state = .closing
+        UIView.animate(withDuration: TimeInterval(time), delay: 0, options: .curveEaseInOut, animations: {
+            if self.style == .discreet {
+                self.blurView.alpha = 0.0
+            }
+            self.container.alpha = 0.0
+            if self.dimView != nil {
+                self.dimView.alpha = 0.0
+            }
+        }, completion: nil)
+        
+        UIView.animate(withDuration: TimeInterval(time), delay: 0, usingSpringWithDamping: 0.5, initialSpringVelocity: time, options: .curveEaseOut, animations: {
+            self.setCenter(self.trayClosed)
+        }, completion: {(success) in
+            self.state = .closed
+        })
+    }
+    
     private func stickToBound(with velocity:CGPoint)  {
-        if state == .expanded {
-            let time = (0.1 ... 0.3).clamp(abs((trayOpened.y - mySuperview.center.y) / velocity.y))
-            
-            UIView.animate(withDuration: TimeInterval(time), delay: 0, options: .curveEaseInOut, animations: {
-                self.setCenter(self.trayOpened)
-                self.container.alpha = 1.0
-            }, completion: { (success) in
-                self.state = .opened
-            })
-            return
-        }
-        
-        
         let multiplier:CGFloat = placement == .top ? 1 : -1
         if multiplier * velocity.y > 0 {
-            let time = (0.3 ... 0.6).clamp(abs((mySuperview.center.y - trayOpened.y) / velocity.y))
-            
-            UIView.animate(withDuration: TimeInterval(time), delay: 0, options: .curveEaseInOut, animations: {
-                if self.style == .discreet {
-                    self.blurView.alpha = 1.0
-                }
-                self.container.alpha = 1.0
-                if self.dimView != nil {
-                    self.dimView.alpha = 0.35
-                }
-            }, completion: nil)
-            
-            UIView.animate(withDuration: TimeInterval(time), delay: 0, usingSpringWithDamping: 0.5, initialSpringVelocity: 3, options: .curveEaseOut, animations: {
-                self.setCenter(self.trayOpened)
-            }, completion: {(success) in
-                self.state = .opened
-            })
+            let time = (0.3 ... 0.5).clamp(abs((mySuperview.center.y - trayOpened.y) / velocity.y))
+            openMenu(duration: time)
         } else {
-            let time = (0.3 ... 0.6).clamp(abs((mySuperview.center.y - trayClosed.y) / velocity.y))
-            
-            UIView.animate(withDuration: TimeInterval(time) - 0.1, delay: 0, options: .curveEaseInOut, animations: {
-                if self.style == .discreet {
-                    self.blurView.alpha = 0.0
-                }
-                self.container.alpha = 0.0
-                if self.dimView != nil {
-                    self.dimView.alpha = 0.0
-                }
-            }, completion: nil)
-            
-            UIView.animate(withDuration: TimeInterval(time), delay: 0, usingSpringWithDamping: 0.5, initialSpringVelocity: 3, options: .curveEaseOut, animations: {
-                self.setCenter(self.trayClosed)
-            }, completion: {(success) in
-                self.state = .closed
-            })
+            let time = (0.3 ... 0.5).clamp(abs((mySuperview.center.y - trayClosed.y) / velocity.y))
+            closeMenu(duration: time)
         }
     }
     
@@ -586,8 +498,6 @@ class TrayMenuViewController: UIViewController {
         }
     }
     
-    private var customView:UIView!
-    
     func expand(withView view:UIView) {
         customView = view
         customView.translatesAutoresizingMaskIntoConstraints = false
@@ -605,21 +515,18 @@ class TrayMenuViewController: UIViewController {
             customView.trailingAnchor.constraint(equalTo: mySuperview.trailingAnchor).isActive = true
         }
         
-        
-    
+        customView.alpha = 0
         UIView.animate(withDuration: 0.3, delay: 0, options: .curveEaseInOut, animations: { 
             self.setCenter(self.trayFullyExpanded)
             self.container.alpha = 0.0
         }, completion: { (success) in
-            UIView.animate(withDuration: 0.1, delay: 0, options: .curveEaseInOut, animations: { 
+            UIView.animate(withDuration: 0.1, delay: 0, options: .curveEaseInOut, animations: {
                 self.customView.alpha = 1.0
             }, completion: { (success) in
                 self.state = .expanded
             })
-            
         })
     }
-    
 }
 
 
