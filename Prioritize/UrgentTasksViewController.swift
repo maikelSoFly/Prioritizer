@@ -8,7 +8,7 @@
 
 import UIKit
 
-class UrgentTasksViewController: UIViewController {
+class UrgentTasksViewController: TaskViewController {
     @IBAction func handleDissmisButton(_ sender: UIButton) {
         self.dismiss(animated: true, completion: nil)
     }
@@ -16,6 +16,7 @@ class UrgentTasksViewController: UIViewController {
     
     @IBOutlet weak var dismissButton: UIButton!
     @IBOutlet weak var label: UILabel!
+    
     weak var trayMenuViewController:TrayMenuViewController!
     private var dimView:DimView!
     
@@ -47,19 +48,31 @@ class UrgentTasksViewController: UIViewController {
         trayMenuViewController.setUpContainer(insets: UIEdgeInsets(top: 20, left: 30, bottom: 25, right: 30), itemsPerRow: 4)
         trayMenuViewController.addControls(controls: [btn5, btn6, btn7, btn8])
         
+        layoutViews()
+    }
+    
+    
+    // ⚡️ FUNCTIONS
+    
+    private func layoutViews() {
+        let label = UILabel()
+        let rc = taskSplitter.urgents.count
+        label.text = "\(rc) \(rc == 1 ? "rocket" : "rockets") trapped here..."
+        label.textColor = UIColor.white
+        label.textAlignment = .center
+        label.translatesAutoresizingMaskIntoConstraints = false
+        view.insertSubview(label, belowSubview: trayMenuView)
         
+        let labelConstraints:[NSLayoutConstraint] = [
+            label.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            label.topAnchor.constraint(equalTo: dismissButton.bottomAnchor, constant: 50.0)
+        ]
+        NSLayoutConstraint.activate(labelConstraints)
     }
     
     deinit {
         print("💾 UrgentTasksViewController deinitialized...")
     }
-    
-
-    
-    
-    
-    // ⚡️ FUNCTIONS
-    
     
     
     @objc func respondToDimViewTap(sender:UITapGestureRecognizer) {

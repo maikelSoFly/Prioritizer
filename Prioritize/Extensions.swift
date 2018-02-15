@@ -69,7 +69,7 @@ extension UIColor {
     }
 }
 
-extension ClosedRange {
+extension ClosedRange { 
     func clamp(_ value : Bound) -> Bound {
         return self.lowerBound > value ? self.lowerBound
             : self.upperBound < value ? self.upperBound

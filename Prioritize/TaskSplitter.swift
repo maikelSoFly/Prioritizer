@@ -8,7 +8,7 @@
 
 import UIKit
 
-class TaskSplitter: NSObject {
+class TaskSplitter {
     var title:String
     var urgents:[Task]
     var moderates:[Task]
@@ -61,7 +61,7 @@ class TaskSplitter: NSObject {
         self.outdated.removeAll()
     }
     
-    func clearTaks(in tier:PriorityTier) {
+    func clearTaks(in tier:Tier) {
         switch tier {
         case .optional:
             optionals.removeAll()
@@ -117,24 +117,6 @@ class TaskSplitter: NSObject {
     }
     
     
-    func addTask(title:String, with description:String, priority:TaskPriority, deadline:Date, maxRealizationTime:Measurement<UnitDuration>) {
-        let task = Task(title: title, description: description, priority: priority, deadline: deadline, maxRealizationTime: maxRealizationTime, color: .red)
-        
-        switch task.tier {
-        case .optional:
-            optionals.append(task)
-            break
-        case .moderate:
-            moderates.append(task)
-            break
-        case .urgent:
-            urgents.append(task)
-            break
-        default:
-            print("❗Task is outdated.")
-        }
-    }
-    
     func addTasks(_ tasks:[Task]) {
         for task in tasks {
             switch task.tier {
@@ -150,6 +132,23 @@ class TaskSplitter: NSObject {
             default:
                 print("❗Task is outdated.")
             }
+        }
+    }
+    
+    
+    func printTasks() {
+        print("Tasks in cache:\n")
+        print("\tUrgent tasks")
+        for task in urgents {
+            print("\t\t\(task.title, task.uuid)")
+        }
+        print("\tModerate tasks")
+        for task in moderates {
+            print("\t\t\(task.title, task.uuid)")
+        }
+        print("\tOptional tasks")
+        for task in optionals {
+            print("\t\t\(task.title, task.uuid)")
         }
     }
     
@@ -173,39 +172,46 @@ class TaskSplitter: NSObject {
         }
     }
     
-    func reloadData(for tier:PriorityTier) {
+    
+    func reloadData(for tier:Tier) {
         switch tier {
         case .optional:
-            for (index, task) in optionals.enumerated() {
-                if task.oldTier != task.tier {
+            for task in optionals {
+                if task.recentTier != task.tier {
+                    if let index = (optionals as NSArray?)?.index(of: task) {
+                        optionals.remove(at: index)
+                    }
                     moveTask(task, to: task.tier)
-                    optionals.remove(at: index)
                 }
             }
             break
         case .moderate:
-            for (index, task) in optionals.enumerated() {
-                if task.oldTier != task.tier {
+            for task in moderates {
+                if task.recentTier != task.tier {
+                    if let index = (moderates as NSArray?)?.index(of: task) {
+                        moderates.remove(at: index)
+                    }
                     moveTask(task, to: task.tier)
-                    moderates.remove(at: index)
                 }
             }
             break
         case .urgent:
-            for (index, task) in optionals.enumerated() {
-                if task.oldTier != task.tier {
+            for task in urgents {
+                if task.recentTier != task.tier {
+                    if let index = (urgents as NSArray?)?.index(of: task) {
+                        urgents.remove(at: index)
+                    }
                     moveTask(task, to: task.tier)
-                    urgents.remove(at: index)
                 }
             }
             break
         case .outdated:
-            print("❗No need to reload outdated tasks.")
+            outdated.removeAll()
             break
         }
     }
     
-    private func moveTask(_ task:Task, to tier:PriorityTier) {
+    private func moveTask(_ task:Task, to tier:Tier) {
         switch tier {
         case .optional:
             optionals.append(task)
@@ -220,6 +226,4 @@ class TaskSplitter: NSObject {
             outdated.append(task)
         }
     }
-    
-    
 }

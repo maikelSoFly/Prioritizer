@@ -44,6 +44,7 @@ class CircleView:UIView {
         return view
     }()
     
+    
     private func setFrameForSectionCircle() -> CGRect {
         var SCFrame:CGRect
         
@@ -63,6 +64,7 @@ class CircleView:UIView {
         return .zero
     }
 
+    
     init(frame:CGRect, color:UIColor, of type:TaskType) {
         self.color = color
         self.taskType = type
@@ -71,6 +73,7 @@ class CircleView:UIView {
         
         dropShadow()
     }
+    
     
     func dropShadow() {
         if taskType == .optional {
@@ -102,7 +105,6 @@ class CircleView:UIView {
     }
     
 }
-
 
 
 
@@ -146,17 +148,17 @@ class PriorityCircleOverallView: UIView {
     
     // 🔥 FUNCTIONS 🔥
     
-    
-    
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
     }
+    
     
     func showSectionCircles(bool:Bool) {
         ergosphereCircleView.showSectionCircleInside(bool: bool)
         eventHorizonCircleView.showSectionCircleInside(bool: bool)
         singularityCircleView.showSectionCircleInside(bool: bool)
     }
+    
     
     public func setUp(for splitter:TaskSplitter) {
         self.backgroundColor = .clear
@@ -174,7 +176,6 @@ class PriorityCircleOverallView: UIView {
         eventHorizonCircleView.addSubview(singularityCircleView)
         
       
-        
         let const:CGFloat = self.frame.width / 3
         protrudingWidth = Double(const/2)
     
@@ -198,7 +199,6 @@ class PriorityCircleOverallView: UIView {
         NSLayoutConstraint.activate(circlesConstraints)
         
         
-        
         //MARK: - Corner radius
         ergosphereCircleView.layoutIfNeeded()
         ergosphereCircleView.layer.cornerRadius = ergosphereCircleView.frame.size.width/2
@@ -211,7 +211,6 @@ class PriorityCircleOverallView: UIView {
         singularityCircleView.sectionCircleView.layoutIfNeeded()
         
         
-        
         //Tap gesture - Making 3 separate gesture recognizers is neccessary
         let aimsTapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector (self.respondToTapGesture(sender:)))
         let objectivesTapGestureRecognizer = UITapGestureRecognizer(target: self, action: #selector (self.respondToTapGesture(sender:)))
@@ -220,6 +219,7 @@ class PriorityCircleOverallView: UIView {
         eventHorizonCircleView.addGestureRecognizer(objectivesTapGestureRecognizer)
         ergosphereCircleView.addGestureRecognizer(aimsTapGestureRecognizer)
     }
+    
     
     //Respond function for Circle Views
     @objc func respondToTapGesture(sender:UITapGestureRecognizer) {
@@ -235,6 +235,7 @@ class PriorityCircleOverallView: UIView {
     func getCenterRocketStartPositionRelative(to view:UIView) -> CGPoint {
         return self.convert(centerRocketStartPosition, to: view)
     }
+    
     
     func getRocketsStartPositionsRelative(to view:UIView) -> [CGPoint] {
         var arr = [CGPoint]()
@@ -296,11 +297,9 @@ class PriorityCircleOverallView: UIView {
         rocketsStartPositions.append(point)
     }
     
+    
     func addRocket(rocket:Rocket) {
-        self.ergosphereCircleView.insertSubview(rocket, belowSubview: eventHorizonCircleView)
+        self.insertSubview(rocket, aboveSubview: eventHorizonCircleView)
+        rocket.startingPosition = rocket.center
     }
-    
-    
-    
-   
 }

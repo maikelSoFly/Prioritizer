@@ -127,7 +127,7 @@ class TrayMenuViewController: UIViewController {
         }
     }
     private var mySuperview:UIView!
-    private var customView:UIView!
+    private var customView:(UIView & TMCustomViewProtocol)!
     
     
     enum IndicatorDirection {
@@ -308,7 +308,9 @@ class TrayMenuViewController: UIViewController {
         delegate.centerPosition?(center)
     }
     
-    private func closeCustomView() {
+    private func closeCustomView() -> Dictionary<String, Any> {
+        let params = customView.getOutput()
+        
         UIView.animate(withDuration: 0.2, delay: 0, options: .curveEaseInOut, animations: { 
             self.customView.alpha = 0.0
         }) { (success) in
@@ -316,16 +318,20 @@ class TrayMenuViewController: UIViewController {
             self.customView = nil
         }
         delegate.menuDidEndEditing?()
+        
+        return params
     }
     
-    func closeFromEditing() {
-        closeCustomView()
+    func closeFromEditing() -> Dictionary<String, Any> {
+        let params = closeCustomView()
         closeMenu(duration: 0.4)
+        
+        return params
     }
     
     @objc func use() {
         if state == .expanded {
-            closeCustomView()
+            _ = closeCustomView()
             openMenu(duration: 0.4)
         } else if state == .closed {
             openMenu(duration: 0.4)
@@ -498,8 +504,9 @@ class TrayMenuViewController: UIViewController {
         }
     }
     
-    func expand(withView view:UIView) {
+    func expand(withView view:UIView & TMCustomViewProtocol) {
         customView = view
+        
         customView.translatesAutoresizingMaskIntoConstraints = false
         self.vibrancyView.contentView.addSubview(customView)
         
@@ -560,8 +567,8 @@ extension TrayMenuViewController:UICollectionViewDelegateFlowLayout {
         
         let availableHeight = collectionView.frame.height - containerInsets.top - containerInsets.bottom
         
-        let itemWidth = (availableWidth / itemsPerRow) - 10
-        let itemHeight = (0 ... itemWidth+15).clamp((availableHeight / (CGFloat(menuControls.count) / itemsPerRow)) - 10)
+        let itemWidth = (availableWidth / itemsPerRow) - 10.0
+        let itemHeight = (0 ... itemWidth+15).clamp((availableHeight / (CGFloat(menuControls.count) / itemsPerRow)) - 10.0)
         
         return CGSize(width: itemWidth, height: itemHeight)
     }

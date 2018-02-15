@@ -8,25 +8,14 @@
 
 import UIKit
 
-class OptionalTasksViewController: UIViewController {
+class OptionalTasksViewController: TaskViewController {
     @IBAction func handleDismissButton(_ sender: UIButton) {
         self.dismiss(animated: true, completion: nil)
     }
     @IBOutlet weak var label: UILabel!
     @IBOutlet weak var dismissButton: UIButton!
     
-    private lazy var collectionView:UICollectionView = {
-        var flowLayout = UICollectionViewFlowLayout()
-        let view = UICollectionView(frame: .zero, collectionViewLayout: flowLayout)
-        view.register(TrayMenuCollectionViewCell.self, forCellWithReuseIdentifier: "OptionalTaskCell")
-        view.dataSource = self
-        view.delegate = self
-        view.translatesAutoresizingMaskIntoConstraints = false
-        view.backgroundColor = .clear
-        view.alpha = 0
-        
-        return view
-    }()
+    
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -36,6 +25,7 @@ class OptionalTasksViewController: UIViewController {
         dismissButton.tintColor = .black
         label.textColor = .black
 
+    
         layoutViews()
     }
     
@@ -44,11 +34,8 @@ class OptionalTasksViewController: UIViewController {
     }
     
     
+    //MARK: - FUNCTIONS
     
-    // ⚡️ FUNCTIONS
-    
-    
-
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
@@ -56,26 +43,22 @@ class OptionalTasksViewController: UIViewController {
     
     
     private func layoutViews() {
+        let label = UILabel()
+        let rc = taskSplitter.optionals.count
+        label.text = "\(rc) \(rc == 1 ? "rocket" : "rockets") trapped here..."
+        label.textAlignment = .center
+        label.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(label)
         
+        let labelConstraints:[NSLayoutConstraint] = [
+            label.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            label.topAnchor.constraint(equalTo: dismissButton.bottomAnchor, constant: 50.0)
+        ]
+        NSLayoutConstraint.activate(labelConstraints)
     }
 }
 
+    
+    
 
-extension OptionalTasksViewController: UICollectionViewDataSource {
-    func numberOfSections(in collectionView: UICollectionView) -> Int {
-        return 1
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return 2
-    }
-    
-    func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "OptionalTaskCell", for: indexPath)
-        return cell
-    }
-}
 
-extension OptionalTasksViewController: UICollectionViewDelegateFlowLayout {
-    
-}

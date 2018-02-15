@@ -8,10 +8,11 @@
 
 import UIKit
 
-class Task: NSObject {
+class Task {
     public var title:String
     public var additionalDescription:String
     public var color:UIColor
+    private(set) var uuid:String
     private(set) var priority:TaskPriority
     private(set) var maxRealizationTime:Measurement<UnitDuration> // Provided by user
     public var maxRealizationTimeInSeconds:Measurement<UnitDuration> {
@@ -26,6 +27,7 @@ class Task: NSObject {
     }
     public var freeTime:Double { /// ADDED--FREETIME--MAXREALIZATIONTIME--DEADLINE
         get {
+            
             return taskDurationTime - maxRealizationTimeInSeconds.value
         }
     }
@@ -34,46 +36,76 @@ class Task: NSObject {
             return abs(timestamp.timeIntervalSinceNow)
         }
     }
+    /// Elapsed part of task's lifespan.
+    public var progress:TimeInterval {
+        get {
+            return currentDuration/self.lifespan
+        }
+    }
     private(set) var deadline:Date
     private(set) var timestamp:Date
+    private let lifespan:TimeInterval
     
     /// Returns specific PriorityTier to assign task to proper group.
     /// Default partitions:
     ///     • Tier 3: from 0 - 50% of freeTime                              (OPTIONAL)
     ///     • Tier 2: from 50% of freeTime till 20% of maxRealizationTime   (MODERATE)
     ///     • Tier 1: from 20% of maxRealizationTime                        (URGENT)
-    private(set) var oldTier:PriorityTier = .optional
-    public var tier:PriorityTier {
+    private(set) var recentTier:Tier = .optional
+    public var tier:Tier {
         get {
             let tier2Border = (freeTime * 0.5) + priorityOffset
             let tier1Border = (freeTime + maxRealizationTimeInSeconds.value * 0.2) + priorityOffset
             
-            
             if currentDuration >= taskDurationTime {
-                oldTier = .outdated
+                recentTier = .outdated
                 return .outdated
             }
             
             if currentDuration >= tier1Border {
-                oldTier = .urgent
+                recentTier = .urgent
                 return .urgent
             } else if currentDuration >= tier2Border {
-                oldTier = .moderate
+                recentTier = .moderate
                 return .moderate
             } else {
-                oldTier = .optional
+                recentTier = .optional
                 return .optional
             }
         }
     }
     
+    
+    func calculateRocketDistance(from startPoint:CGPoint, endPoint:CGPoint) -> CGFloat? {
+        var dist:CGFloat
+        let D = hypot(startPoint.x - endPoint.x, startPoint.y - endPoint.y)
+    
+        let t2Border = (freeTime * 0.5) + priorityOffset
+        let t1Border = (freeTime + maxRealizationTimeInSeconds.value * 0.2) + priorityOffset
+        
+        switch tier {
+        case .optional:
+            dist = CGFloat(currentDuration).remap(from1: 0, to1: CGFloat(t2Border), from2: 0, to2: D/3)
+            break
+        case .moderate:
+            dist = CGFloat(currentDuration).remap(from1: CGFloat(t2Border), to1: CGFloat(t1Border), from2: D/3, to2: 2*(D/3))
+            break
+        case .urgent:
+            dist = CGFloat(currentDuration).remap(from1: CGFloat(t1Border), to1: CGFloat(lifespan), from2: 2*(D/3), to2: D)
+            break
+        case .outdated:
+            dist = D
+        }
+        
+        return dist
+    }
+    
+
     /// Remaining time till deadline.
     /// Calculated from deadline and current time.
-    public var remainingTime:Measurement<UnitDuration> {
+    public var remainingTime:TimeInterval {
         get { // Returns remaing time till deadline in minutes.
-            let timeInterval = deadline.timeIntervalSinceNow // in seconds
-            let minutes = Measurement<UnitDuration>(value: timeInterval, unit: .seconds).converted(to: .minutes)
-            return Measurement<UnitDuration>(value: round(minutes.value), unit: .minutes)
+            return deadline.timeIntervalSinceNow // in seconds
         }
     }
     
@@ -101,7 +133,7 @@ class Task: NSObject {
     
     
     
-    init(title:String, description:String, priority:TaskPriority, deadline:Date, maxRealizationTime:Measurement<UnitDuration>, color:UIColor) {
+    init(title:String, description:String, priority:TaskPriority, deadline:Date, maxRealizationTime:Measurement<UnitDuration>, color:UIColor, uuid:String) {
         self.title = title
         self.additionalDescription = description
         self.priority = priority
@@ -109,6 +141,12 @@ class Task: NSObject {
         self.maxRealizationTime = maxRealizationTime
         self.color = color
         self.timestamp = Date(timeIntervalSinceNow: 0)
+        self.uuid = uuid
+        self.lifespan = deadline.timeIntervalSinceNow
+    }
+    
+    deinit {
+        print("Task \(uuid) deinitialized.")
     }
 }
 
@@ -116,6 +154,9 @@ enum TaskPriority {
     case low, normal, high
 }
 
-enum PriorityTier {
-    case optional, moderate, urgent, outdated
+enum Tier:String {
+    case optional = "OPTIONAL"
+    case moderate = "MODERATE"
+    case urgent = "URGENT"
+    case outdated = "OUTDATED"
 }

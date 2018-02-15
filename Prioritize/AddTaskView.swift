@@ -8,11 +8,9 @@
 
 import UIKit
 
-protocol AddTaskViewDelegate {
-    func launch()
-}
 
-class AddTaskView: UIView {
+
+class AddTaskView: UIView, TMCustomViewProtocol {
     //MARK: Variables
     private var titleTextField:UITextField = {
         let textField = UITextField()
@@ -126,7 +124,7 @@ class AddTaskView: UIView {
         return label
     }()
     
-    var delegate:AddTaskViewDelegate?
+
     var currentView:CurrenView!
     fileprivate var hours = 150
  
@@ -373,11 +371,17 @@ class AddTaskView: UIView {
             break
         }
     }
-    
-    
-    
-    
 
+    func getOutput() -> Dictionary<String, Any> {
+        var params = Dictionary<String, Any>()
+        params["title"] = self.titleTextField.text
+        params["description"] = self.descriptionTextView.text
+        params["deadline"] = self.deadlineDatePicker.date
+        params["workTime"] = self.workTimeDatePicker.countDownDuration
+        
+        
+        return params
+    }
 }
 
 

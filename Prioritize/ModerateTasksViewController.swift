@@ -8,7 +8,7 @@
 
 import UIKit
 
-class ModerateTasksViewController: UIViewController {
+class ModerateTasksViewController: TaskViewController {
     @IBAction func handleDismissButton(_ sender: UIButton) {
         self.dismiss(animated: true, completion: nil)
     }
@@ -23,8 +23,7 @@ class ModerateTasksViewController: UIViewController {
         dismissButton.tintColor = .white
         label.textColor = .white
         
-
-        // Do any additional setup after loading the view.
+        layoutViews()
     }
     
     deinit {
@@ -33,6 +32,22 @@ class ModerateTasksViewController: UIViewController {
     
     
     // ⚡️ FUNCTIONS
+    
+    private func layoutViews() {
+        let label = UILabel()
+        let rc = taskSplitter.moderates.count
+        label.text = "\(rc) \(rc == 1 ? "rocket" : "rockets") trapped here..."
+        label.textColor = UIColor.white
+        label.textAlignment = .center
+        label.translatesAutoresizingMaskIntoConstraints = false
+        view.addSubview(label)
+        
+        let labelConstraints:[NSLayoutConstraint] = [
+            label.centerXAnchor.constraint(equalTo: view.centerXAnchor),
+            label.topAnchor.constraint(equalTo: dismissButton.bottomAnchor, constant: 50.0)
+        ]
+        NSLayoutConstraint.activate(labelConstraints)
+    }
     
     
 
