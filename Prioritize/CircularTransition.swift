@@ -13,16 +13,20 @@ class CircularTransition: NSObject {
     weak var circle:CircleView!
     var transitionMode:CircularTransitionMode = .present
     var centerPoint:CGPoint!
+    private var rockets:[Rocket]!
     
 
     enum CircularTransitionMode {
         case present, dismiss, pop
     }
     
-    func setUp(circle:CircleView, duration:TimeInterval, centerPoint:CGPoint) {
+    func setUp(circle:CircleView, duration:TimeInterval, centerPoint:CGPoint, _ rockets:[Rocket]? = nil) {
         self.circle = circle
         self.duration = duration
         self.centerPoint = centerPoint
+        if let rockets = rockets {
+            self.rockets = rockets
+        }
     }
     
     fileprivate func hideSubviews(of view:UIView, _ boolean:Bool) {
@@ -64,10 +68,14 @@ extension CircularTransition:UIViewControllerAnimatedTransitioning {
                         for view in view.subviews  {
                             view.alpha = 0
                         }
+                        for rocket in self.rockets {
+                            rocket.alpha = 0.0
+                        }
                     }, completion: { (success) in
                         self.hideSubviews(of: view, true)
-                        view.isOpened = true
                     })
+                    
+                    
                     
                     //Scaling views
                     UIView.animate(withDuration: 0.35, delay: 0, options: .curveEaseInOut, animations: {
@@ -77,6 +85,7 @@ extension CircularTransition:UIViewControllerAnimatedTransitioning {
                     }, completion: { (success) in
                         transitionContext.completeTransition(success)
                         fromVC.viewDidDisappear(true)
+                        view.isOpened = true
                     })
                 }
             } else { //HIDING
@@ -95,6 +104,7 @@ extension CircularTransition:UIViewControllerAnimatedTransitioning {
                         returningView.removeFromSuperview()
                         transitionContext.completeTransition(success)
                         toVC.viewDidAppear(true)
+                        view.isOpened = false
                     })
                     
                     //Showing subviews with fade animation
@@ -103,11 +113,11 @@ extension CircularTransition:UIViewControllerAnimatedTransitioning {
                         for view in view.subviews {
                             view.alpha = 1.0
                         }
-                    }, completion: { (success) in
-                        view.isOpened = false
-                    })
+                        for rocket in self.rockets {
+                            rocket.alpha = 1.0
+                        }
+                    }, completion: nil)
                 }
             }
-        
     }
 }

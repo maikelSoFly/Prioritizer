@@ -57,8 +57,3 @@ class OptionalTasksViewController: TaskViewController {
         NSLayoutConstraint.activate(labelConstraints)
     }
 }
-
-    
-    
-
-

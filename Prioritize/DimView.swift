@@ -80,5 +80,4 @@ class DimView: UIView {
             NSLayoutConstraint.activate(dimConstraints)
         }
     }
-
 }

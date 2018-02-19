@@ -32,6 +32,4 @@ class RadialGradientView: UIView {
         
         context?.drawRadialGradient(gradient!, startCenter: center, startRadius: 0.0, endCenter: center, endRadius: endRadius, options: CGGradientDrawingOptions.drawsBeforeStartLocation)
     }
-    
-    
 }

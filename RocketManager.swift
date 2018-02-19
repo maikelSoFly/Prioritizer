@@ -9,7 +9,7 @@
 import Foundation
 
 class RocketManager {
-    private var rockets:Dictionary<String, Rocket>
+    private(set) var rockets:Dictionary<String, Rocket>
     
     init() {
         self.rockets = Dictionary<String, Rocket>()
@@ -33,5 +33,4 @@ class RocketManager {
             print("Rocket of key \(key) removed")
         }
     }
-    
 }

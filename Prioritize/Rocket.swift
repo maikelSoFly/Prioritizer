@@ -8,29 +8,28 @@
 
 import UIKit
 
-@objc protocol RocketDelegate {
+protocol RocketDelegate {
     func aproachedBlackHole(rocket:Rocket, on position:CGPoint)
     func isAproachingBlackHole()
     func rocketCanBeRemoved(rocket:Rocket)
+    func tier(of rocket:Rocket, changedTo tier:Tier)
     func moved()
 }
 
 class Rocket: UIImageView {
     weak var task:Task?
     var lastEndPoint:CGPoint!
-    weak var delegate:RocketDelegate!
+    private var delegates:[RocketDelegate]!
     private(set) var isInBlackHole = false
     var startingPosition:CGPoint!
     private(set) var uuid:String
     private var previousTier:Tier
-    private var tierIndicator:CALayer!
     
     init(frame: CGRect, uuid:String, task:Task) {
         self.uuid = uuid
         self.task = task
         self.previousTier = .optional
         super.init(frame: frame)
-        decorate()
     }
     
     required init?(coder aDecoder: NSCoder) {
@@ -39,20 +38,6 @@ class Rocket: UIImageView {
     
     deinit {
         print("Rocket \(uuid) deinitialized.")
-    }
-    
-    func decorate() {
-        tierIndicator = CALayer()
-        let width = CGFloat(5.0)
-        tierIndicator.backgroundColor = UIColor.white.cgColor
-        let frameW = frame.width, frameH = frame.height
-        tierIndicator.frame = CGRect(x: frameW/2-width/2, y: frameH + 4.0, width: width, height: width)
-        
-        tierIndicator.cornerRadius = width/2
-        tierIndicator.borderColor = UIColor.black.cgColor
-        tierIndicator.borderWidth = 0.5
-        layer.addSublayer(tierIndicator)
-        layer.masksToBounds = false
     }
     
     
@@ -87,20 +72,15 @@ class Rocket: UIImageView {
         
         if self.task?.recentTier != previousTier {
             print("Task \(String(describing: task?.title)) changed from \(previousTier.rawValue) to \(task?.tier.rawValue ?? "")")
-            
-            if task?.recentTier == .moderate {
-                tierIndicator.backgroundColor = UIColor.red.cgColor
-                tierIndicator.borderColor = UIColor.lightGray.cgColor
-            } else {
-                tierIndicator.backgroundColor = UIColor.black.cgColor
+    
+            for delegate in delegates {
+                delegate.tier(of: self, changedTo: (task?.recentTier)!)
             }
-            
             
             previousTier = (task?.recentTier)!
         }
         
         let distanceDone = hypot(startingPosition.x-center.x, startingPosition.y-center.y)
-        print("Distance done", distanceDone)
         let distance = distance - distanceDone
         
         x3 = x1 + (distance/D)*(x2-x1)
@@ -115,13 +95,19 @@ class Rocket: UIImageView {
         animation.delegate = self
         animation.path = path.cgPath
         animation.fillMode = kCAFillModeForwards
-        //animation.isRemovedOnCompletion = false
         animation.duration = 0.75
         animation.timingFunction = CAMediaTimingFunction(name: kCAMediaTimingFunctionEaseInEaseOut)
         self.layer.add(animation, forKey: nil)
         self.center = lastEndPoint
         
         print("Moving rocket with task \(task?.title ?? "none") by \(distance) px")
+    }
+    
+    func addDelegate(_ delegate:RocketDelegate) {
+        if delegates == nil {
+            delegates = [RocketDelegate]()
+        }
+        delegates.append(delegate)
     }
 }
 
@@ -131,20 +117,69 @@ extension Rocket:CAAnimationDelegate {
     func animationDidStop(_ anim: CAAnimation, finished flag: Bool) {
         if flag && !isInBlackHole {
             isInBlackHole = true
-            delegate?.aproachedBlackHole(rocket: self, on: lastEndPoint!)
+            for delegate in delegates {
+                delegate.aproachedBlackHole(rocket: self, on: lastEndPoint!)
+            }
         } else {
             layer.removeAllAnimations()
             if task?.recentTier == .outdated {
                 self.removeFromSuperview()
-                delegate.rocketCanBeRemoved(rocket: self)
+                for delegate in delegates {
+                    delegate.rocketCanBeRemoved(rocket: self)
+                }
             }
-            delegate.moved()
         }
     }
     
     func animationDidStart(_ anim: CAAnimation) {
         if !isInBlackHole {
-            delegate?.isAproachingBlackHole()
+            for delegate in delegates {
+                delegate.isAproachingBlackHole()
+            }
         }
     }
+}
+
+class RocketDecorator {
+    private weak var rocket:Rocket?
+    private var tierIndicator:CALayer!
+    
+    init(_ rocket:Rocket) {
+        self.rocket = rocket
+        rocket.addDelegate(self)
+    }
+    
+    func addTierIndicator() {
+        tierIndicator = CALayer()
+        let width = CGFloat(5.0)
+        tierIndicator.backgroundColor = UIColor.white.cgColor
+        let frameW = rocket?.frame.width, frameH = rocket?.frame.height
+        tierIndicator.frame = CGRect(x: frameW!/2-width/2, y: frameH! + 4.0, width: width, height: width)
+        
+        tierIndicator.cornerRadius = width/2
+        tierIndicator.borderColor = UIColor.black.cgColor
+        tierIndicator.borderWidth = 0.5
+        rocket?.layer.addSublayer(tierIndicator)
+        rocket?.layer.masksToBounds = false
+    }
+}
+
+extension RocketDecorator:RocketDelegate {
+    func aproachedBlackHole(rocket: Rocket, on position: CGPoint) {}
+    
+    func isAproachingBlackHole() {}
+    
+    func rocketCanBeRemoved(rocket: Rocket) {}
+    
+    func tier(of rocket: Rocket, changedTo tier: Tier) {
+        if tier == .moderate {
+            tierIndicator.backgroundColor = UIColor.red.cgColor
+            tierIndicator.borderColor = UIColor.lightGray.cgColor
+        } else {
+            tierIndicator.backgroundColor = UIColor.black.cgColor
+            tierIndicator.borderColor = UIColor.lightGray.cgColor
+        }
+    }
+    
+    func moved() {}
 }

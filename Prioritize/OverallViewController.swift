@@ -43,6 +43,7 @@ class OverallViewController: UIViewController {
     
     
     //MARK: - FUNCTIONS
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         let notificationCenter = NotificationCenter.default
@@ -71,10 +72,7 @@ class OverallViewController: UIViewController {
         
         //MARK: - Tray menu.
         view.bringSubview(toFront: menuBarView)
-    
-//🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰
-//   Process of adding Tray Menu with buttons and dim.
-        
+
         //MARK: - Dim View
         dimView = DimView(in: self.view, forTrayView: menuBarView, withStyle: .top)
         menuBar.dimView = dimView
@@ -95,12 +93,7 @@ class OverallViewController: UIViewController {
         menuBar.addControls(controls: arr)
         
         //MARK: - Button targets
-        
         btn1.addTarget(self, action: #selector(addTask(sender:)), for: .touchUpInside)
-        //btn3.addTarget(self, action: #selector(handleShowProgressButton), for: .touchUpInside)
-        // ...
-
-//🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰🀰
     
         
         //MARK: - Rockets 🚀
@@ -110,13 +103,14 @@ class OverallViewController: UIViewController {
         let centerRocketPos = priorityCircleOverallView.getCenterRocketStartPositionRelative(to: self.view)
         rocketLaunchPosition = CGPoint(x: centerRocketPos.x, y: 0)
         pathsGenerator = PathsGenerator(startPoint: rocketLaunchPosition, endPoints: rocketsStartPositions)
-        
     }
+    
     
     @objc func appMovedToBackground() {
         print("App moved to background!")
         timer.invalidate()
     }
+    
     
     @objc func appMovedToForeground() {
         print("App moved to foreground!")
@@ -126,26 +120,17 @@ class OverallViewController: UIViewController {
         }
     }
 
-    
-    
+
     deinit {
         print("💾 OverallViewController deinitialized...")
     }
     
     
-    @objc func test(sender:UITapGestureRecognizer) {
-       
-    }
-    
-    
     @objc func updateTimer(timer:Timer) {
         print("\n⏱ Timer update!")
-        
         taskSplitter?.reloadData(for: .optional)
         taskSplitter?.reloadData(for: .moderate)
         taskSplitter?.reloadData(for: .urgent)
-        //taskSplitter?.reloadData(for: .outdated)
-        //taskSplitter?.printTasks()
         if !rocketAnimationInProgress {
             moveRockets()
         }
@@ -165,7 +150,6 @@ class OverallViewController: UIViewController {
         allTasks.append(contentsOf: (taskSplitter?.moderates)!)
         allTasks.append(contentsOf: (taskSplitter?.urgents)!)
         allTasks.append(contentsOf: (taskSplitter?.outdated)!)
-        
         
         for task in allTasks {
             if let rocket = rocketManager.getRocketWithTask(task) {
@@ -219,8 +203,9 @@ class OverallViewController: UIViewController {
         rocketManager.addRocket(key:taskUUID, rocket:rocket)
         taskSplitter?.addTasks([task])
         
-        rocket.delegate = self
+        rocket.addDelegate(self)
         rocket.image = #imageLiteral(resourceName: "rock3t")
+        RocketDecorator(rocket).addTierIndicator()
         view.insertSubview(rocket, belowSubview: menuBarView)
         let paths = pathsGenerator.pathsDictionary
         let randNum = Int(arc4random_uniform(UInt32(rocketsStartPositions.count)) + UInt32(0))
@@ -235,14 +220,17 @@ class OverallViewController: UIViewController {
         return .slide
     }
     
+    
     override var prefersStatusBarHidden: Bool{
         return isStatusBarHidden
     }
+    
     
     override func didReceiveMemoryWarning() {
         super.didReceiveMemoryWarning()
         // Dispose of any resources that can be recreated.
     }
+    
     
     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
         if segue.identifier == "TrayMenuSegue" {
@@ -250,21 +238,21 @@ class OverallViewController: UIViewController {
             menuBar.delegate = self
             return
         }
-        
         /// For circular transision
         let vc = segue.destination
         vc.transitioningDelegate = self
         vc.modalPresentationStyle = .custom
     }
     
+    
     override func viewDidAppear(_ animated: Bool) {
         priorityCircleOverallView.showSectionCircles(bool: true)
     }
     
+    
     override func viewDidDisappear(_ animated: Bool) {
         priorityCircleOverallView.showSectionCircles(bool: false)
     }
-    
 }
 
 
@@ -275,7 +263,8 @@ extension OverallViewController:PriorityCircleOverallDelegate {
     func tapped(on circle: CircleView) {
         let type = circle.taskType
         
-        transition.setUp(circle: circle, duration: 0.1, centerPoint: priorityCircleOverallView.center)
+        let rockets = Array(rocketManager.rockets.values)
+        transition.setUp(circle: circle, duration: 0.1, centerPoint: priorityCircleOverallView.center, rockets)
         
         switch type {
         case .urgent:
@@ -336,6 +325,10 @@ extension OverallViewController:TrayMenuDelegate {
 }
 
 extension OverallViewController:RocketDelegate {
+    func tier(of rocket: Rocket, changedTo tier: Tier) {
+        
+    }
+    
     func isAproachingBlackHole() {
         self.rocketAnimationInProgress = true
     }
@@ -356,7 +349,5 @@ extension OverallViewController:RocketDelegate {
         }
     }
     
-    func moved() {
-        taskSplitter?.printTasks()
-    }
+    func moved() {}
 }
