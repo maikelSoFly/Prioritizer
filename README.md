@@ -7,9 +7,10 @@
 ---
 
 
-<div style="float: left; width: 33.33%;padding: 5px;">
 
-    <img src="https://raw.githubusercontent.com/maikelSoFly/Prioritizer/master/Docs/screen1.jpg" width="300"/>
 
-    <img src="https://raw.githubusercontent.com/maikelSoFly/Prioritizer/master/Docs/screen1.jpg" width="300"/>
-</div>
+<p float="left">
+  <img src="https://raw.githubusercontent.com/maikelSoFly/Prioritizer/master/Docs/screen1.jpg" width="100" />
+  <img src="https://raw.githubusercontent.com/maikelSoFly/Prioritizer/master/Docs/screen1.jpg" width="100" /> 
+  <img src="https://raw.githubusercontent.com/maikelSoFly/Prioritizer/master/Docs/screen1.jpg" width="100" />
+</p>
