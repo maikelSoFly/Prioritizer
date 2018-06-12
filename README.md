@@ -7,6 +7,10 @@
 ---
 
 
-<p align="center">
+<p align="left">
+    <img src="https://raw.githubusercontent.com/maikelSoFly/Prioritizer/master/Docs/screen1.jpg" width="300"/>
+</p>
+
+<p align="left">
     <img src="https://raw.githubusercontent.com/maikelSoFly/Prioritizer/master/Docs/screen1.jpg" width="300"/>
 </p>
