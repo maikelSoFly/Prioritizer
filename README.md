@@ -7,10 +7,10 @@
 ---
 
 
-<p  style="float:left; width:300px;">
+<div style="float:left; width:300px;">
     <img src="https://raw.githubusercontent.com/maikelSoFly/Prioritizer/master/Docs/screen1.jpg" width="300"/>
-</p>
+</div>
 
-<p style="float:left; width:300px;">
+<div style="float:left; width:300px;">
     <img src="https://raw.githubusercontent.com/maikelSoFly/Prioritizer/master/Docs/screen1.jpg" width="300"/>
-</p>
+</div>
