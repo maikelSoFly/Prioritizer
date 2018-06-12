@@ -8,5 +8,5 @@
 
 
 <p align="center">
-    <img src="https://raw.githubusercontent.com/maikelSoFly/Prioritizer/master/Docs/screen1.jpg" width="550"/>
+    <img src="https://raw.githubusercontent.com/maikelSoFly/Prioritizer/master/Docs/screen1.jpg" width="300"/>
 </p>
